@@ -137,3 +137,11 @@ export default function DashboardStats() {
     </div>
   );
 }
+
+// //Add a hamburger button to the NavBar (visible on mobile/small screens).
+// Sidebar will be hidden on mobile by default, and slide in when the hamburger is clicked.
+// Show a full-screen blurred overlay when the sidebar is open; clicking the overlay closes the sidebar.
+// Sidebar remains visible on desktop.
+
+
+
