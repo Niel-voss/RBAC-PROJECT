@@ -2,25 +2,37 @@
 
 import Link from 'next/link';
 import {
-  LayoutGrid, BookOpen, GraduationCap, Calendar, FileText, User, CreditCard, MessageSquare, Library as LibraryIcon, Settings
+  LayoutGrid, BookOpen, GraduationCap, Calendar, FileText, User, CreditCard, MessageSquare, Library as LibraryIcon, Settings, Users, Megaphone, ClipboardList
 } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 
+export const currentUserRole = 'admin'; // Change to 'lecturer' or 'admin' to test the UI
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar();
 
+  // Temporarily hardcoded for testing. 
+  // Later, you will replace this with the actual role from your auth session.
+
+
+  // The complete list of links with an allowedRoles array for filtering
   const navLinks = [
-    { name: 'Dashboard', icon: LayoutGrid, href: '#', active: true },
-    { name: 'Courses', icon: BookOpen, href: '#' },
-    { name: 'Results', icon: GraduationCap, href: '#' },
-    { name: 'Timetable', icon: Calendar, href: '#' },
-    { name: 'Assignments', icon: FileText, href: '#' },
-    { name: 'Attendance', icon: User, href: '#' },
-    { name: 'Fees', icon: CreditCard, href: '#' },
-    { name: 'Messages', icon: MessageSquare, href: '#' },
-    { name: 'Library', icon: LibraryIcon, href: '#' },
-    { name: 'Settings', icon: Settings, href: '#' },
+    { name: 'Dashboard', icon: LayoutGrid, href: '#', active: true, allowedRoles: ['student', 'lecturer', 'admin'] },
+    { name: 'Courses', icon: BookOpen, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
+    { name: 'Results', icon: GraduationCap, href: '#', active: false, allowedRoles: ['student', 'lecturer', 'admin'] },
+    { name: 'Timetable', icon: Calendar, href: '#', active: false, allowedRoles: ['student', 'lecturer', 'admin'] },
+    { name: 'Assignments', icon: FileText, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
+    { name: 'Attendance', icon: User, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
+    { name: 'Fees', icon: CreditCard, href: '#', active: false, allowedRoles: ['student', 'admin'] },
+    { name: 'User Management', icon: Users, href: '#', active: false, allowedRoles: ['admin'] },
+    { name: 'Admissions', icon: ClipboardList, href: '#', active: false, allowedRoles: ['admin'] },
+    { name: 'Broadcasts', icon: Megaphone, href: '#', active: false, allowedRoles: ['admin'] },
+    { name: 'Messages', icon: MessageSquare, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
+    { name: 'Library', icon: LibraryIcon, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
+    { name: 'Settings', icon: Settings, href: '#', active: false, allowedRoles: ['student', 'lecturer', 'admin'] },
   ];
+
+  // Filter the links based on who is logged in before rendering
+  const visibleLinks = navLinks.filter(link => link.allowedRoles.includes(currentUserRole));
 
   return (
     <>
@@ -38,7 +50,8 @@ export default function Sidebar() {
           }`}
       >
         <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          {navLinks.map((link) => {
+          {/* Map over visibleLinks instead of navLinks */}
+          {visibleLinks.map((link) => {
             const Icon = link.icon;
             return (
               <Link
