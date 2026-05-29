@@ -12,14 +12,18 @@ import { currentUserRole } from './Sidebar-temp';
 export default function NavBar() {
   const { setIsOpen } = useSidebar();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null); // Note: removed <HTMLDivElement> since this looks like standard JS, not TS
+  // 1. Tell TS this ref specifically holds an HTML Div element
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    // 2. Tell TS this function accepts Mouse or Touch events
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      // 3. Tell TS "trust me, event.target is a valid DOM Node"
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
     return () => {
