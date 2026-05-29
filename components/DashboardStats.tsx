@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react';
 import { Star, BookOpen, FileText, Users } from 'lucide-react';
 
 export default function DashboardStats() {
@@ -12,21 +11,10 @@ export default function DashboardStats() {
     attendance: { current: 92, max: 100 } // Percentage
   };
 
-  // Animation state for CGPA circle and progress bars
-  const [cgpaProgress, setCgpaProgress] = useState(0);
-  const [coursesProgress, setCoursesProgress] = useState(0);
-  const [assignmentsProgress, setAssignmentsProgress] = useState(0);
-  const [attendanceProgress, setAttendanceProgress] = useState(0);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setCgpaProgress((stats.cgpa.current / stats.cgpa.max) * 100);
-      setCoursesProgress((stats.courses.current / stats.courses.max) * 100);
-      setAssignmentsProgress((stats.assignments.current / stats.assignments.max) * 100);
-      setAttendanceProgress(stats.attendance.current);
-    }, 50);
-    return () => clearTimeout(timeout);
-  }, []);
+  const cgpaProgress = (stats.cgpa.current / stats.cgpa.max) * 100;
+  const coursesProgress = (stats.courses.current / stats.courses.max) * 100;
+  const assignmentsProgress = (stats.assignments.current / stats.assignments.max) * 100;
+  const attendanceProgress = stats.attendance.current;
 
   // Math for the CGPA SVG Circle Progress
   const circleRadius = 16;
@@ -137,11 +125,3 @@ export default function DashboardStats() {
     </div>
   );
 }
-
-// //Add a hamburger button to the NavBar (visible on mobile/small screens).
-// Sidebar will be hidden on mobile by default, and slide in when the hamburger is clicked.
-// Show a full-screen blurred overlay when the sidebar is open; clicking the overlay closes the sidebar.
-// Sidebar remains visible on desktop.
-
-
-

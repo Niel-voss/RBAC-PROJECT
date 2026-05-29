@@ -44,10 +44,11 @@ export default function Sidebar() {
               <Link
                 key={link.name}
                 href={link.href}
+                prefetch={false}
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-medium text-sm ${link.active
-                    ? 'bg-[#3B52D9] text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-[#3B52D9] text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`}
               >
                 <Icon

@@ -1,20 +1,9 @@
 
 
-'use client';
-import React, { useEffect, useState } from 'react';
-
 export default function WelcomeBanner() {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setShow(true), 50);
-    return () => clearTimeout(timeout);
-  }, []);
-
   return (
     <div
-      className={`relative w-full overflow-hidden bg-[#0A2268] rounded-xl p-4 shadow-sm flex items-center min-h-[96px] transition-all duration-[800ms] ease-out ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-      style={{ willChange: 'opacity, transform' }}
+      className="relative w-full overflow-hidden bg-[#0A2268] rounded-xl p-4 shadow-sm flex items-center min-h-[96px]"
     >
       {/* Left Content Container */}
       <div className="relative z-10 flex flex-col gap-1.5 max-w-2xl">

@@ -73,7 +73,7 @@ export default function TodaysSchedule({ scheduleData }: TodaysScheduleProps) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 className="text-sm font-bold text-slate-900 leading-tight">Today&apos;s Schedule</h2>
-          <p className="text-[11px] text-slate-500 mt-0.5">{todayDate}</p>
+          <p className="text-[11px] text-slate-500 mt-0.5" suppressHydrationWarning>{todayDate}</p>
         </div>
         <button className="flex items-center gap-1 bg-slate-50 hover:bg-slate-100 text-slate-600 text-[10px] font-medium px-2.5 py-1.5 rounded-lg border border-slate-100 transition-colors">
           View Full Timetable <ChevronRight className="w-3 h-3" />
