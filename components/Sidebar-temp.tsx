@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 
-export const currentUserRole = 'admin'; // Change to 'lecturer' or 'admin' to test the UI
+export const currentUserRole = 'lecturer'; // Change to 'lecturer' or 'admin' to test the UI
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar();
 
@@ -16,21 +16,30 @@ export default function Sidebar() {
 
   // The complete list of links with an allowedRoles array for filtering
   const navLinks = [
+    // --- SHARED ---
     { name: 'Dashboard', icon: LayoutGrid, href: '#', active: true, allowedRoles: ['student', 'lecturer', 'admin'] },
-    { name: 'Courses', icon: BookOpen, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
-    { name: 'Results', icon: GraduationCap, href: '#', active: false, allowedRoles: ['student', 'lecturer', 'admin'] },
-    { name: 'Timetable', icon: Calendar, href: '#', active: false, allowedRoles: ['student', 'lecturer', 'admin'] },
-    { name: 'Assignments', icon: FileText, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
-    { name: 'Attendance', icon: User, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
-    { name: 'Fees', icon: CreditCard, href: '#', active: false, allowedRoles: ['student', 'admin'] },
-    { name: 'User Management', icon: Users, href: '#', active: false, allowedRoles: ['admin'] },
-    { name: 'Admissions', icon: ClipboardList, href: '#', active: false, allowedRoles: ['admin'] },
-    { name: 'Broadcasts', icon: Megaphone, href: '#', active: false, allowedRoles: ['admin'] },
-    { name: 'Messages', icon: MessageSquare, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
-    { name: 'Library', icon: LibraryIcon, href: '#', active: false, allowedRoles: ['student', 'lecturer'] },
-    { name: 'Settings', icon: Settings, href: '#', active: false, allowedRoles: ['student', 'lecturer', 'admin'] },
-  ];
 
+    // --- STUDENT SPECIFIC ---
+    { name: 'Course Registration', icon: BookOpen, href: '#', active: false, allowedRoles: ['student'] },
+    { name: 'Academic Record', icon: GraduationCap, href: '#', active: false, allowedRoles: ['student'] },
+    { name: 'Timetable', icon: Calendar, href: '#', active: false, allowedRoles: ['student'] },
+    { name: 'Assignments', icon: FileText, href: '#', active: false, allowedRoles: ['student'] },
+    { name: 'Attendance', icon: User, href: '#', active: false, allowedRoles: ['student'] },
+    { name: 'Fees', icon: CreditCard, href: '#', active: false, allowedRoles: ['student'] },
+
+    // --- LECTURER SPECIFIC ---
+    { name: 'My Courses', icon: BookOpen, href: '#', active: false, allowedRoles: ['lecturer'] },
+    { name: 'Grade Management', icon: ClipboardList, href: '#', active: false, allowedRoles: ['lecturer'] }, // You can change this icon if needed
+    { name: 'Attendance Tracker', icon: User, href: '#', active: false, allowedRoles: ['lecturer'] },
+    { name: 'Timetable', icon: Calendar, href: '#', active: false, allowedRoles: ['lecturer'] },
+
+    // --- ADMIN SPECIFIC ---
+    { name: 'User Management', icon: Users, href: '#', active: false, allowedRoles: ['admin'] },
+    { name: 'Academic Structure', icon: LayoutGrid, href: '#', active: false, allowedRoles: ['admin'] }, // Assuming a structure/layout icon
+    { name: 'Session and Semester', icon: Calendar, href: '#', active: false, allowedRoles: ['admin'] },
+    { name: 'Admission', icon: ClipboardList, href: '#', active: false, allowedRoles: ['admin'] },
+    { name: 'Broadcasts', icon: Megaphone, href: '#', active: false, allowedRoles: ['admin'] }
+  ];
   // Filter the links based on who is logged in before rendering
   const visibleLinks = navLinks.filter(link => link.allowedRoles.includes(currentUserRole));
 
