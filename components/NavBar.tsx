@@ -1,24 +1,37 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation'; // <-- Import this
 import {
   Menu, Bell, GraduationCap, Search,
-  HelpCircle, Mail, LogOut, ChevronUp
+  HelpCircle, LogOut, ChevronUp
 } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
-// 1. Import the role from your Sidebar file
-import { currentUserRole } from './Sidebar-temp';
 
 export default function NavBar() {
   const { setIsOpen } = useSidebar();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // 1. Tell TS this ref specifically holds an HTML Div element
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // 1. Get the current URL path
+  const pathname = usePathname();
+
+  // 2. Extract the role from the URL 
+  // If the path is "/student/dashboard", splitting by "/" gives ["", "student", "dashboard"]
+  const pathSegments = pathname.split('/');
+  const activeRole = pathSegments[1] || 'student'; // Fallback to student just in case
+
+  // 3. (Optional) Create dynamic names based on the role so the UI feels real during testing
+  const userProfiles: Record<string, { name: string, avatarAlt: string }> = {
+    student: { name: 'Thomas Daniel', avatarAlt: "Daniel's Avatar" },
+    lecturer: { name: 'Dr. Adewale', avatarAlt: "Lecturer Avatar" },
+    admin: { name: 'System Admin', avatarAlt: "Admin Avatar" }
+  };
+
+  const currentUser = userProfiles[activeRole] || userProfiles['student'];
+
   useEffect(() => {
-    // 2. Tell TS this function accepts Mouse or Touch events
     function handleClickOutside(event: MouseEvent | TouchEvent) {
-      // 3. Tell TS "trust me, event.target is a valid DOM Node"
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
@@ -44,7 +57,7 @@ export default function NavBar() {
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="bg-[#3B52D9] p-2 rounded-xl flex items-center justify-center shadow-sm shrink-0">
+          <div className="bg-[#0B173D] p-2 rounded-xl flex items-center justify-center shadow-sm shrink-0">
             <GraduationCap className="w-5 h-5 text-white" strokeWidth={2} />
           </div>
           <div className="hidden md:flex flex-col">
@@ -56,7 +69,7 @@ export default function NavBar() {
 
       {/* Middle: Adaptive Search Bar */}
       <div className="flex flex-1 justify-center max-w-2xl min-w-0">
-        <div className="flex items-center bg-slate-50 border border-slate-100 rounded-full px-3 py-2 w-full transition-all focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-300">
+        <div className="flex items-center bg-slate-50 border border-slate-100 rounded-full px-3 py-2 w-full transition-all focus-within:ring-2 focus-within:ring-[#0B173D]/20 focus-within:border-[#0B173D]/30">
           <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
           <input
             type="text"
@@ -70,15 +83,14 @@ export default function NavBar() {
       <div className="flex items-center gap-3 sm:gap-5 justify-end shrink-0">
         <button className="text-slate-500 hover:text-slate-800 transition-colors relative p-1">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-0.5 right-0.5 block w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+          <span className="absolute top-0.5 right-0.5 block w-2 h-2 bg-orange-500 rounded-full border-2 border-white"></span>
         </button>
-
 
         <div className="relative flex items-center gap-1" ref={dropdownRef}>
           <img
             src="/api/placeholder/150/150"
-            alt="Daniel's Avatar"
-            className="w-8 h-8 rounded-full object-cover border border-slate-200 cursor-pointer hover:ring-2 hover:ring-blue-100 transition-all"
+            alt={currentUser.avatarAlt}
+            className="w-8 h-8 rounded-full object-cover border border-slate-200 cursor-pointer hover:ring-2 hover:ring-[#0B173D]/20 transition-all"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           />
           <button
@@ -95,9 +107,11 @@ export default function NavBar() {
               <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white border-t border-l border-slate-100 transform rotate-45"></div>
               <div className="relative z-10 bg-white rounded-xl flex flex-col">
                 <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                  <p className="text-sm font-semibold text-slate-800">Daniel</p>
+                  {/* Dynamically display the user's name */}
+                  <p className="text-sm font-semibold text-slate-800">{currentUser.name}</p>
+                  {/* Dynamically display the role */}
                   <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-                    {currentUserRole}
+                    {activeRole}
                   </p>
                 </div>
                 <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors">

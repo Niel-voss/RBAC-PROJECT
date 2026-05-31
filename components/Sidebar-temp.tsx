@@ -1,51 +1,52 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
-  LayoutGrid, BookOpen, GraduationCap, Calendar, FileText, User, CreditCard, MessageSquare, Library as LibraryIcon, Settings, Users, Megaphone, ClipboardList
+  LayoutGrid, BookOpen, GraduationCap, Calendar, FileText, User, CreditCard, MessageSquare, LibraryIcon, Settings, Users, Megaphone, ClipboardList
 } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 
-export const currentUserRole = 'lecturer'; // Change to 'lecturer' or 'admin' to test the UI
-export default function Sidebar() {
+interface SidebarProps {
+  role: 'student' | 'lecturer' | 'admin';
+}
+
+export default function Sidebar({ role }: SidebarProps) {
   const { isOpen, setIsOpen } = useSidebar();
+  const pathname = usePathname();
 
-  // Temporarily hardcoded for testing. 
-  // Later, you will replace this with the actual role from your auth session.
-
-
-  // The complete list of links with an allowedRoles array for filtering
+  // Notice we only define the end 'path'. We will prepend the role dynamically.
   const navLinks = [
     // --- SHARED ---
-    { name: 'Dashboard', icon: LayoutGrid, href: '#', active: true, allowedRoles: ['student', 'lecturer', 'admin'] },
+    { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard', allowedRoles: ['student', 'lecturer', 'admin'] },
 
     // --- STUDENT SPECIFIC ---
-    { name: 'Course Registration', icon: BookOpen, href: '#', active: false, allowedRoles: ['student'] },
-    { name: 'Academic Record', icon: GraduationCap, href: '#', active: false, allowedRoles: ['student'] },
-    { name: 'Timetable', icon: Calendar, href: '#', active: false, allowedRoles: ['student'] },
-    { name: 'Assignments', icon: FileText, href: '#', active: false, allowedRoles: ['student'] },
-    { name: 'Attendance', icon: User, href: '#', active: false, allowedRoles: ['student'] },
-    { name: 'Fees', icon: CreditCard, href: '#', active: false, allowedRoles: ['student'] },
+    { name: 'Course Registration', icon: BookOpen, path: '/course-registration', allowedRoles: ['student'] },
+    { name: 'Academic Record', icon: GraduationCap, path: '/academic-record', allowedRoles: ['student'] },
+    { name: 'Timetable', icon: Calendar, path: '/timetable', allowedRoles: ['student'] },
+    { name: 'Assignments', icon: FileText, path: '/assignments', allowedRoles: ['student'] },
+    { name: 'Attendance', icon: User, path: '/attendance', allowedRoles: ['student'] },
+    { name: 'Fees', icon: CreditCard, path: '/fees', allowedRoles: ['student'] },
 
     // --- LECTURER SPECIFIC ---
-    { name: 'My Courses', icon: BookOpen, href: '#', active: false, allowedRoles: ['lecturer'] },
-    { name: 'Grade Management', icon: ClipboardList, href: '#', active: false, allowedRoles: ['lecturer'] }, // You can change this icon if needed
-    { name: 'Attendance Tracker', icon: User, href: '#', active: false, allowedRoles: ['lecturer'] },
-    { name: 'Timetable', icon: Calendar, href: '#', active: false, allowedRoles: ['lecturer'] },
+    { name: 'My Courses', icon: BookOpen, path: '/my-courses', allowedRoles: ['lecturer'] },
+    { name: 'Grade Management', icon: ClipboardList, path: '/grade-management', allowedRoles: ['lecturer'] },
+    { name: 'Attendance Tracker', icon: User, path: '/attendance-tracker', allowedRoles: ['lecturer'] },
+    { name: 'Timetable', icon: Calendar, path: '/timetable', allowedRoles: ['lecturer'] }, // Duplicate name is fine, role filters it
 
     // --- ADMIN SPECIFIC ---
-    { name: 'User Management', icon: Users, href: '#', active: false, allowedRoles: ['admin'] },
-    { name: 'Academic Structure', icon: LayoutGrid, href: '#', active: false, allowedRoles: ['admin'] }, // Assuming a structure/layout icon
-    { name: 'Session and Semester', icon: Calendar, href: '#', active: false, allowedRoles: ['admin'] },
-    { name: 'Admission', icon: ClipboardList, href: '#', active: false, allowedRoles: ['admin'] },
-    { name: 'Broadcasts', icon: Megaphone, href: '#', active: false, allowedRoles: ['admin'] }
+    { name: 'User Management', icon: Users, path: '/user-management', allowedRoles: ['admin'] },
+    { name: 'Academic Structure', icon: LayoutGrid, path: '/academic-structure', allowedRoles: ['admin'] },
+    { name: 'Session and Semester', icon: Calendar, path: '/session-settings', allowedRoles: ['admin'] },
+    { name: 'Admission', icon: ClipboardList, path: '/admission', allowedRoles: ['admin'] },
+    { name: 'Broadcasts', icon: Megaphone, path: '/broadcasts', allowedRoles: ['admin'] }
   ];
-  // Filter the links based on who is logged in before rendering
-  const visibleLinks = navLinks.filter(link => link.allowedRoles.includes(currentUserRole));
+
+  // Filter links based on the role passed from the layout
+  const visibleLinks = navLinks.filter(link => link.allowedRoles.includes(role));
 
   return (
     <>
-      {/* Blurred Overlay for Mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 md:hidden transition-opacity"
@@ -53,29 +54,34 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Sidebar Navigation */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-100 flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          {/* Map over visibleLinks instead of navLinks */}
           {visibleLinks.map((link) => {
             const Icon = link.icon;
+
+            // Dynamically build the full URL (e.g., /student/dashboard)
+            const fullHref = `/${role}${link.path}`;
+
+            // Check if the current URL matches this exact link
+            const isActive = pathname === fullHref;
+
             return (
               <Link
                 key={link.name}
-                href={link.href}
+                href={fullHref}
                 prefetch={false}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-medium text-sm ${link.active
-                  ? 'bg-[#3B52D9] text-white shadow-md shadow-blue-500/20'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-medium text-sm ${isActive
+                    ? 'bg-[#0B173D] text-white shadow-md shadow-blue-900/20'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`}
               >
                 <Icon
-                  className={`w-5 h-5 ${link.active ? 'text-white' : 'text-slate-500'}`}
-                  strokeWidth={link.active ? 2 : 1.5}
+                  className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-500'}`}
+                  strokeWidth={isActive ? 2 : 1.5}
                 />
                 {link.name}
               </Link>
