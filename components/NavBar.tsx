@@ -1,34 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { usePathname } from 'next/navigation'; // <-- Import this
-import {
-  Menu, Bell, GraduationCap, Search,
-  HelpCircle, LogOut, ChevronUp
-} from 'lucide-react';
-import { useSidebar } from './SidebarContext';
+import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { Menu, Bell, GraduationCap, Search, HelpCircle, LogOut, ChevronUp } from "lucide-react";
+import { useSidebar } from "./SidebarContext";
 
 export default function NavBar() {
   const { setIsOpen } = useSidebar();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // 1. Get the current URL path
   const pathname = usePathname();
 
-  // 2. Extract the role from the URL 
-  // If the path is "/student/dashboard", splitting by "/" gives ["", "student", "dashboard"]
-  const pathSegments = pathname.split('/');
-  const activeRole = pathSegments[1] || 'student'; // Fallback to student just in case
+  const pathSegments = pathname.split("/");
+  const activeRole = pathSegments[1] || "student";
 
-  // 3. (Optional) Create dynamic names based on the role so the UI feels real during testing
-  const userProfiles: Record<string, { name: string, avatarAlt: string }> = {
-    student: { name: 'Thomas Daniel', avatarAlt: "Daniel's Avatar" },
-    lecturer: { name: 'Dr. Adewale', avatarAlt: "Lecturer Avatar" },
-    admin: { name: 'System Admin', avatarAlt: "Admin Avatar" }
+  const userProfiles: Record<string, { name: string; avatarAlt: string }> = {
+    student: { name: "Thomas Daniel", avatarAlt: "Daniel's Avatar" },
+    lecturer: { name: "Dr. Adewale", avatarAlt: "Lecturer Avatar" },
+    admin: { name: "System Admin", avatarAlt: "Admin Avatar" },
   };
 
-  const currentUser = userProfiles[activeRole] || userProfiles['student'];
+  const currentUser = userProfiles[activeRole] || userProfiles["student"];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
@@ -36,7 +29,6 @@ export default function NavBar() {
         setIsDropdownOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
     return () => {
@@ -46,7 +38,12 @@ export default function NavBar() {
   }, []);
 
   return (
-    <nav className="flex items-center justify-between px-3 py-3 bg-white border-b border-slate-100 w-full z-50 h-16 shrink-0 gap-2 sm:gap-4 relative">
+    <motion.nav
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="flex items-center justify-between px-3 py-3 bg-white border-b border-slate-100 w-full z-50 h-16 shrink-0 gap-2 sm:gap-4 relative"
+    >
       {/* Left: Menu Toggle & Brand */}
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         <button
@@ -97,7 +94,7 @@ export default function NavBar() {
             aria-label="Open profile menu"
             className="flex items-center justify-center p-1 rounded-full hover:bg-slate-100 transition-colors border border-slate-200"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            style={{ transform: 'rotate(180deg)' }}
+            style={{ transform: "rotate(180deg)" }}
           >
             <ChevronUp className="w-4 h-4 text-slate-500" />
           </button>
@@ -107,27 +104,21 @@ export default function NavBar() {
               <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white border-t border-l border-slate-100 transform rotate-45"></div>
               <div className="relative z-10 bg-white rounded-xl flex flex-col">
                 <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                  {/* Dynamically display the user's name */}
                   <p className="text-sm font-semibold text-slate-800">{currentUser.name}</p>
-                  {/* Dynamically display the role */}
-                  <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-                    {activeRole}
-                  </p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wide">{activeRole}</p>
                 </div>
                 <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors">
-                  <HelpCircle className="w-4 h-4 text-slate-400" />
-                  Help Center
+                  <HelpCircle className="w-4 h-4 text-slate-400" /> Help Center
                 </button>
                 <div className="h-px bg-slate-100 my-1"></div>
                 <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
-                  <LogOut className="w-4 h-4 text-red-400" />
-                  Log Out
+                  <LogOut className="w-4 h-4 text-red-400" /> Log Out
                 </button>
               </div>
             </div>
           )}
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 }
