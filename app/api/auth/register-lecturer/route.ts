@@ -63,3 +63,10 @@
 //     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
 //   }
 // }
+
+// app/api/auth/register-lecturer/route.ts
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  return NextResponse.json({ message: "Lecturer registration coming soon" });
+}
