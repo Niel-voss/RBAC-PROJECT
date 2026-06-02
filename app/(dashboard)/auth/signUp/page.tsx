@@ -85,7 +85,9 @@ export default function CreateAccountMicro() {
           <p className="text-slate-500 text-[11px] text-center">Join the Univ. of Oluku Portal</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3"
+          method="POST"
+        >
 
           {error && (
             <motion.div
@@ -162,7 +164,7 @@ export default function CreateAccountMicro() {
         </form>
 
         <p className="text-center text-[11px] text-slate-500 mt-5">
-          Already have an account? <Link href="/login" className="text-[#0a1845] font-semibold hover:underline">Login</Link>
+          Already have an account? <Link href="/auth/login" className="text-[#0a1845] font-semibold hover:underline">Login</Link>
         </p>
 
       </div>
