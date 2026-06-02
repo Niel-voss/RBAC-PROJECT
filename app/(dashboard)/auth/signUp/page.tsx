@@ -28,8 +28,20 @@ export default function CreateAccountMicro() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const closeModal = (redirect = false) => {
+    setShowModal(false);
+    if (redirect) {
+      router.push('/student');
+      router.refresh();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,19 +77,48 @@ export default function CreateAccountMicro() {
         throw new Error("Account created but failed to sign in");
       }
 
-      router.push("/student");
-      router.refresh();
+      // Show success modal, then auto-close and redirect
+      setModalMessage('Account created successfully');
+      setShowModal(true);
+      setLoading(false);
+
+      setTimeout(() => {
+        // auto-close and redirect after showing the modal briefly
+        closeModal(true);
+      }, 1800);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
-    } finally {
       setLoading(false);
     }
-  }; // <-- CLOSING handleSubmit HERE!
+  };
 
   // The return statement is now safely OUTSIDE the handleSubmit function
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex items-center justify-center p-4 font-sans">
+
+      {/* Modal overlay */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-lg shadow-lg p-5 w-[320px] mx-4">
+            <div className="flex justify-between items-start">
+              <h3 className="text-lg font-semibold">Success</h3>
+              <button
+                onClick={() => closeModal(true)}
+                aria-label="Close"
+                className="text-slate-500 hover:text-slate-700"
+              >
+                ×
+              </button>
+            </div>
+            <p className="text-sm text-slate-900 mt-3">{modalMessage}</p>
+            <div className="mt-4 flex justify-end">
+              <button onClick={() => closeModal(true)} className="px-3 py-1 rounded bg-[#0a1845] text-white">Continue</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-[340px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-7">
 
         <div className="flex flex-col items-center mb-5">

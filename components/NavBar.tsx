@@ -90,14 +90,7 @@ export default function NavBar() {
             className="w-8 h-8 rounded-full object-cover border border-slate-200 cursor-pointer hover:ring-2 hover:ring-[#0B173D]/20 transition-all"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           />
-          <button
-            aria-label="Open profile menu"
-            className="flex items-center justify-center p-1 rounded-full hover:bg-slate-100 transition-colors border border-slate-200"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            style={{ transform: "rotate(180deg)" }}
-          >
-            <ChevronUp className="w-4 h-4 text-slate-500" />
-          </button>
+
 
           {isDropdownOpen && (
             <div className="absolute right-0 top-full mt-3 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">

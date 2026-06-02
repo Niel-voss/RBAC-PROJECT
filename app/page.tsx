@@ -7,7 +7,7 @@ export default function LandingPage() {
       <p className="text-gray-600 mb-8">Please select your portal to continue:</p>
 
       <div className="flex gap-4">
-        <Link href="/auth/signUp" className="px-6 py-2 bg-[#0B173D] text-white rounded-lg">
+        <Link href="/signup" className="px-6 py-2 bg-[#0B173D] text-white rounded-lg">
           Student Portal
         </Link>
         <Link href="/lecturer" className="px-6 py-2 bg-orange-500 text-white rounded-lg">
