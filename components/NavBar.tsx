@@ -17,7 +17,7 @@ export default function NavBar() {
   const activeRole = pathSegments[1] || "student";
 
   const userProfiles: Record<string, { name: string; avatarAlt: string }> = {
-    student: { name: "Thomas Daniel", avatarAlt: "Daniel's Avatar" },
+    student: { name: "Odumodu Black", avatarAlt: "Daniel's Avatar" },
     lecturer: { name: "Dr. Adewale", avatarAlt: "Lecturer Avatar" },
     admin: { name: "System Admin", avatarAlt: "Admin Avatar" },
   };

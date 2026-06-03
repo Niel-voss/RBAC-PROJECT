@@ -29,10 +29,10 @@ enum Role {
 // This handles all login, security, and role-checking.
 
 model User {
-  id                 String    @id @default(uuid())
-  email              String    @unique
-  password           String
-  role               Role      @default(STUDENT)
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  role     Role   @default(STUDENT)
 
   // Standard Production Security Fields
   isVerified         Boolean   @default(false)
@@ -41,13 +41,13 @@ model User {
   tokenExpiry        DateTime?
 
   // Timestamps
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations to the specific role profiles
-  studentProfile     Student?
-  lecturerProfile    Lecturer?
-  adminProfile       Admin?
+  studentProfile  Student?
+  lecturerProfile Lecturer?
+  adminProfile    Admin?
 }
 
 // ------------------------------------------------------
@@ -56,46 +56,42 @@ model User {
 // These hold the specific data for each role.
 
 model Student {
-  id                  String   @id @default(uuid())
-  
-  // Link back to the User table for auth details
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Specific Student Fields
-  studentName         String   // Replaces standard 'name' based on your rules
-  matriculationNumber String   @unique
+  studentName         String
+  matriculationNumber String @unique
   department          String
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Lecturer {
-  id            String   @id @default(uuid())
-  
-  // Link back to the User table
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Specific Lecturer Fields
-  lecturerName  String   // Replaces standard 'name'
-  course        String   // Note: In the future, you could make this a relation to a 'Course' model
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  lecturerName String
+  course       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Admin {
-  id            String   @id @default(uuid())
-  
-  // Link back to the User table
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Specific Admin Fields
-  adminName     String   // Replaces standard 'name'
+  adminName String
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
