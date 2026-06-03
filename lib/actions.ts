@@ -25,7 +25,11 @@ export async function registerStudent(formData: RegisterFormData) {
       where: {
         OR: [
           { email },
-          { matricNumber }
+          {
+            studentProfile: {
+              matriculationNumber: matricNumber // Maps to the variable passed into your function
+            }
+          }
         ]
       },
     });
@@ -38,12 +42,20 @@ export async function registerStudent(formData: RegisterFormData) {
 
     await prisma.user.create({
       data: {
-        name,
+        // 1. Base User Auth Fields
         email,
-        matricNumber,
         password: hashedPassword,
-        role: "STUDENT",
-      },
+        role: "STUDENT", // (Optional if your schema default handles this)
+
+        // 2. Nested write to create the connected Student profile
+        studentProfile: {
+          create: {
+            studentName: name,
+            matriculationNumber: matricNumber, // <-- Make sure this matches the schema spelling!
+            department: "Computer Science"     // <-- IMPORTANT: Your schema requires a department!
+          }
+        }
+      }
     });
 
     return { success: true };
