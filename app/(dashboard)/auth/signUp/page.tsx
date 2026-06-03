@@ -39,8 +39,9 @@ export default function CreateAccountMicro() {
   const closeModal = (redirect = false) => {
     setShowModal(false);
     if (redirect) {
-      router.push('/student');
       router.refresh();
+      router.push('/student');
+
     }
   };
 

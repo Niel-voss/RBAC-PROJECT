@@ -10,7 +10,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   // Add any routes here where you DO NOT want the navbar and sidebar
   // (I added "/" just in case you use Option 2 from earlier for a landing page)
-  const isAuthPage = pathname === "/signup" || pathname === "/login" || pathname === "/";
+  const isAuthPage =
+    pathname === "/auth/signUp" ||
+    pathname === "/auth/login" ||
+    pathname === "/terms" || // <-- Added Terms
+    pathname === "/";
 
   // Extract the role from the URL (e.g., /student/dashboard -> "student")
   const pathSegments = pathname.split('/');

@@ -3,7 +3,7 @@ import { signIn, signOut } from "next-auth/react";
 
 
 export const logout = async () => {
-  await signOut({ callbackUrl: "/auth/SignIn" });
+  await signOut({ callbackUrl: "/" });
 };
 
 export const login = async () => {

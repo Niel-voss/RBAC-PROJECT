@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Menu, Bell, GraduationCap, Search, HelpCircle, LogOut, ChevronUp } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
+import { logout } from "../lib/auth";
 
 export default function NavBar() {
   const { setIsOpen } = useSidebar();
@@ -104,7 +105,9 @@ export default function NavBar() {
                   <HelpCircle className="w-4 h-4 text-slate-400" /> Help Center
                 </button>
                 <div className="h-px bg-slate-100 my-1"></div>
-                <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+                <button
+                  onClick={logout}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
                   <LogOut className="w-4 h-4 text-red-400" /> Log Out
                 </button>
               </div>

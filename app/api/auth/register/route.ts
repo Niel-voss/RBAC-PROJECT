@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     }
 
     // 4. Hash password safely
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 8);
 
     // 5. Create user and student profile
     const newStudentAccount = await prisma.user.create({

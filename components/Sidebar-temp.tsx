@@ -18,7 +18,7 @@ export default function Sidebar({ role }: SidebarProps) {
   // Notice we only define the end 'path'. We will prepend the role dynamically.
   const navLinks = [
     // --- SHARED ---
-    { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard', allowedRoles: ['student', 'lecturer', 'admin'] },
+    { name: 'Dashboard', icon: LayoutGrid, path: '', allowedRoles: ['student', 'lecturer', 'admin'] },
 
     // --- STUDENT SPECIFIC ---
     { name: 'Course Registration', icon: BookOpen, path: '/course-registration', allowedRoles: ['student'] },
@@ -75,8 +75,8 @@ export default function Sidebar({ role }: SidebarProps) {
                 prefetch={false}
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-medium text-sm ${isActive
-                    ? 'bg-[#0B173D] text-white shadow-md shadow-blue-900/20'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-[#0B173D] text-white shadow-md shadow-blue-900/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`}
               >
                 <Icon
