@@ -35,7 +35,7 @@ export default function Sidebar({ role }: SidebarProps) {
     { name: 'Timetable', icon: Calendar, path: '/timetable', allowedRoles: ['lecturer'] }, // Duplicate name is fine, role filters it
 
     // --- ADMIN SPECIFIC ---
-    { name: 'User Management', icon: Users, path: '/user-management', allowedRoles: ['admin'] },
+    { name: 'User Management', icon: Users, path: '/users', allowedRoles: ['admin'] },
     { name: 'Academic Structure', icon: LayoutGrid, path: '/academic-structure', allowedRoles: ['admin'] },
     { name: 'Session and Semester', icon: Calendar, path: '/session-settings', allowedRoles: ['admin'] },
     { name: 'Admission', icon: ClipboardList, path: '/admission', allowedRoles: ['admin'] },
