@@ -5,19 +5,24 @@ import NavBar from "@/components/NavBar";
 import SideBar from "@/components/Sidebar-temp";
 import { SidebarProvider } from "@/components/SidebarContext";
 
-export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
+// 1. Define the props to accept the session data
+interface LayoutWrapperProps {
+  children: React.ReactNode;
+  userName?: string | null;
+  userRole?: string | null;
+}
+
+export default function LayoutWrapper({ children, userName, userRole }: LayoutWrapperProps) {
   const pathname = usePathname();
 
   // Add any routes here where you DO NOT want the navbar and sidebar
-  // (I added "/" just in case you use Option 2 from earlier for a landing page)
   const isAuthPage =
     pathname === "/auth/signUp" ||
     pathname === "/auth/login" ||
     pathname === "/unauthorized" ||
     pathname === "/auth/lecturer-login" ||
-    pathname === "/terms" || // <-- Added Terms
+    pathname === "/terms" ||
     pathname === "/";
-
 
   // Extract the role from the URL (e.g., /student/dashboard -> "student")
   const pathSegments = pathname.split('/');
@@ -43,7 +48,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <div className="flex flex-col h-screen">
 
         {/* Top Navigation spans the full width */}
-        <NavBar />
+        {/* 2. Pass the dynamic session props to NavBar! */}
+        <NavBar userName={userName} userRole={userRole} />
 
         {/* Bottom section: Sidebar and Main Content */}
         <div className="flex flex-1 overflow-hidden relative">

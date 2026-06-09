@@ -21,8 +21,8 @@ export default function CreateAccountMicro() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    matricNumber: "", // <-- Added this to match your input
-    password: "",     // <-- Added this for the password input
+    matricNumber: "",
+    password: "",
   });
 
   const [error, setError] = useState("");
@@ -39,9 +39,9 @@ export default function CreateAccountMicro() {
   const closeModal = (redirect = false) => {
     setShowModal(false);
     if (redirect) {
-      router.refresh();
-      router.push('/student');
-
+      // THE FIX: Hard reload instead of router.push
+      // This forces the layout to fetch the fresh name from the database!
+      window.location.href = '/student';
     }
   };
 
@@ -94,7 +94,6 @@ export default function CreateAccountMicro() {
     }
   };
 
-  // The return statement is now safely OUTSIDE the handleSubmit function
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex items-center justify-center p-4 font-sans">
 
@@ -173,7 +172,6 @@ export default function CreateAccountMicro() {
             icon={<IdCard />}
           />
 
-          {/* Replaced duplicate email with Password */}
           <div>
             <InputField
               label="Password"
@@ -185,7 +183,7 @@ export default function CreateAccountMicro() {
               icon={<Lock />}
             />
           </div>
-          {/* Added the missing Checkbox UI so 'agreed' state actually updates */}
+
           <div className="flex items-start sm:items-center gap-2 mt-1 ml-0.5">
             <input
               type="checkbox"
@@ -197,7 +195,6 @@ export default function CreateAccountMicro() {
               I agree to <Link href="/terms" className="text-[#0a1845] font-semibold hover:underline">terms & conditions</Link>
             </label>
           </div>
-
 
           <div className="mt-2">
             <SubmitButton isLoading={loading} />

@@ -1,42 +1,18 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import NotificationAndProfile from "./NotificationAndProfile";
 import { motion } from "framer-motion";
-import { Menu, Bell, GraduationCap, Search, HelpCircle, LogOut, ChevronUp } from "lucide-react";
+import { Menu, GraduationCap, Search } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
-import { logout } from "../lib/auth";
 
-export default function NavBar() {
+interface NavBarProps {
+  userName?: string | null;
+  userRole?: string | null;
+}
+
+// FIX: We pass { userName, userRole } into the function here
+export default function NavBar({ userName, userRole }: NavBarProps) {
   const { setIsOpen } = useSidebar();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
-
-  const pathSegments = pathname.split("/");
-  const activeRole = pathSegments[1] || "student";
-
-  const userProfiles: Record<string, { name: string; avatarAlt: string }> = {
-    student: { name: "Odumodu Black", avatarAlt: "Daniel's Avatar" },
-    lecturer: { name: "Dr. Adewale", avatarAlt: "Lecturer Avatar" },
-    admin: { name: "System Admin", avatarAlt: "Admin Avatar" },
-  };
-
-  const currentUser = userProfiles[activeRole] || userProfiles["student"];
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent | TouchEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, []);
 
   return (
     <motion.nav
@@ -77,44 +53,11 @@ export default function NavBar() {
         </div>
       </div>
 
-      {/* Right: Notifications & Profile */}
-      <div className="flex items-center gap-3 sm:gap-5 justify-end shrink-0">
-        <button className="text-slate-500 hover:text-slate-800 transition-colors relative p-1">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-0.5 right-0.5 block w-2 h-2 bg-orange-500 rounded-full border-2 border-white"></span>
-        </button>
-
-        <div className="relative flex items-center gap-1" ref={dropdownRef}>
-          <img
-            src="/api/placeholder/150/150"
-            alt={currentUser.avatarAlt}
-            className="w-8 h-8 rounded-full object-cover border border-slate-200 cursor-pointer hover:ring-2 hover:ring-[#0B173D]/20 transition-all"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          />
-
-
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-3 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-              <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white border-t border-l border-slate-100 transform rotate-45"></div>
-              <div className="relative z-10 bg-white rounded-xl flex flex-col">
-                <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                  <p className="text-sm font-semibold text-slate-800">{currentUser.name}</p>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-wide">{activeRole}</p>
-                </div>
-                <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors">
-                  <HelpCircle className="w-4 h-4 text-slate-400" /> Help Center
-                </button>
-                <div className="h-px bg-slate-100 my-1"></div>
-                <button
-                  onClick={logout}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
-                  <LogOut className="w-4 h-4 text-red-400" /> Log Out
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Right: Profile and Notifications */}
+      <NotificationAndProfile
+        userName={userName || "User"}
+        userRole={userRole || "student"}
+      />
     </motion.nav>
   );
 }
