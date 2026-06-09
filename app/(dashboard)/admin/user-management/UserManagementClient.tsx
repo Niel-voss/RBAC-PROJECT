@@ -25,13 +25,24 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
-  // Pagination Logic
+  // --- 1. PIN THE CHIEF ADMINISTRATOR ---
+  // Sort the users so the demo admin is ALWAYS at the top.
+  const sortedUsers = [...initialUsers].sort((a, b) => {
+    // If 'a' is the admin email, it goes to the top (-1)
+    if (a.email === 'admin@oluku.edu.ng') return -1;
+    // If 'b' is the admin email, it goes to the top (1)
+    if (b.email === 'admin@oluku.edu.ng') return 1;
+    // Otherwise, keep their natural order (or you could sort alphabetically by name here)
+    return 0;
+  });
+
+  // Pagination Logic (Now using the sorted array)
   const itemsPerPage = 8;
-  const totalUsers = initialUsers.length;
+  const totalUsers = sortedUsers.length;
   const totalPages = Math.ceil(totalUsers / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = initialUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentUsers = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   // Dynamic Stats Calculation
   const studentsCount = initialUsers.filter(u => u.role === 'STUDENT').length;
@@ -51,8 +62,6 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
       });
 
       if (!response.ok) throw new Error('Failed to update role');
-
-      // Instantly refresh the page data to show the new role
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -62,12 +71,25 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
     }
   };
 
+  // --- 2. COLOR CODING (Matching Reference UI) ---
+
+  // Colors for the Role Badge
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'STUDENT': return 'bg-indigo-50 text-indigo-700';
-      case 'LECTURER': return 'bg-orange-50 text-orange-700';
-      case 'ADMIN': return 'bg-green-50 text-green-700';
+      case 'STUDENT': return 'bg-indigo-50 text-[#1E3A8A] border border-indigo-100'; // Dark Blue text, light bg
+      case 'LECTURER': return 'bg-orange-50 text-[#EA580C] border border-orange-100'; // Orange text, light bg
+      case 'ADMIN': return 'bg-green-50 text-[#16A34A] border border-green-100';     // Green text, light bg
       default: return 'bg-gray-50 text-gray-700';
+    }
+  };
+
+  // Colors for the Circular Avatar Initial
+  const getAvatarColor = (role: string) => {
+    switch (role) {
+      case 'STUDENT': return 'bg-[#0B173D] text-white'; // The Navy Blue from the UI
+      case 'LECTURER': return 'bg-[#EA580C] text-white'; // The Orange from the UI
+      case 'ADMIN': return 'bg-[#1E293B] text-white';    // Very dark gray/black for Admin
+      default: return 'bg-gray-500 text-white';
     }
   };
 
@@ -159,7 +181,8 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
           >
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-medium text-sm shrink-0">
+                {/* Applied Dynamic Avatar Color */}
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm shrink-0 ${getAvatarColor(user.role)}`}>
                   {getInitials(user.name)}
                 </div>
                 <div className="truncate">
@@ -172,12 +195,11 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                 <span className="text-xs font-medium text-green-500">Active</span>
               </div>
             </div>
-            {/* Interactive Mobile Role Dropdown */}
             <select
               defaultValue={user.role}
-              disabled={isLoading}
+              disabled={isLoading || user.email === 'admin@oluku.edu.ng'} // Prevent locking yourself out!
               onChange={(e) => handleRoleChange(user.id, e.target.value)}
-              className={`w-full mt-2 px-3 py-2 border rounded-lg text-xs font-medium focus:outline-none ${getRoleColor(user.role)}`}
+              className={`w-full mt-2 px-3 py-2 rounded-lg text-xs font-medium focus:outline-none ${getRoleColor(user.role)}`}
             >
               <option value="STUDENT" className="bg-white text-gray-900">Student</option>
               <option value="LECTURER" className="bg-white text-gray-900">Lecturer</option>
@@ -208,7 +230,8 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
               {currentUsers.map((user, idx) => (
                 <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-medium text-sm">
+                    {/* Applied Dynamic Avatar Color */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm ${getAvatarColor(user.role)}`}>
                       {getInitials(user.name)}
                     </div>
                     <div>
@@ -219,12 +242,11 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                   <td className="px-6 py-4 text-gray-500">{user.department}</td>
                   <td className="px-6 py-4 text-gray-500">{user.email}</td>
                   <td className="px-6 py-4">
-                    {/* The Interactive Dropdown hitting your API */}
                     <select
                       defaultValue={user.role}
-                      disabled={isLoading}
+                      disabled={isLoading || user.email === 'admin@oluku.edu.ng'} // Prevent locking yourself out!
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold border-0 cursor-pointer focus:ring-2 focus:ring-indigo-500 appearance-none outline-none ${getRoleColor(user.role)}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer focus:ring-2 focus:ring-indigo-500 appearance-none outline-none ${getRoleColor(user.role)}`}
                     >
                       <option value="STUDENT" className="bg-white text-gray-900">STUDENT</option>
                       <option value="LECTURER" className="bg-white text-gray-900">LECTURER</option>
@@ -320,7 +342,6 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                 </button>
               </div>
               <div className="p-4 md:p-5 space-y-3">
-                {/* Add your modal navigation/forms here later! */}
                 <button className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-left group">
                   <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg group-hover:bg-indigo-200"><GraduationCap className="w-5 h-5" /></div>
                   <div>
