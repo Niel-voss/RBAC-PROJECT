@@ -6,6 +6,7 @@ import DashboardStats from "@/components/DashboardStats";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import Schedule from "@/components/Schedule";
 import { SidebarProvider } from "@/components/SidebarContext";
+import FeePayment from "@/components/FeePayment";
 
 export default async function Home() {
   // 1. Get the current logged-in session
@@ -36,16 +37,36 @@ export default async function Home() {
   return (
     <>
       <SidebarProvider>
-        {/* 5. Pass the dynamic database values directly into your banner */}
-        <WelcomeBanner
-          name={student?.studentName || "Student"}
-          matricNumber={student?.matriculationNumber || "N/A"}
-          department={student?.department || "Unassigned"}
-        />
+        {/* ✨ THE MAGIC WRAPPER ✨ */}
+        {/* This flex-col ensures your Banner, Stats, and Bottom Row stack perfectly with a 24px gap (gap-6) */}
+        <div className="flex flex-col gap-6 w-full p-4 md:p-6 lg:p-8">
 
-        {/* Your other components remain completely untouched! */}
-        <DashboardStats />
-        <Schedule />
+          {/* ROW 1: Welcome Banner */}
+          <WelcomeBanner
+            name={student?.studentName || "Student"}
+            matricNumber={student?.matriculationNumber || "N/A"}
+            department={student?.department || "Unassigned"}
+          />
+
+          {/* ROW 2: Stats Cards */}
+          <DashboardStats />
+
+          {/* ROW 3: Schedule & Fee Payment */}
+          {/* Changed to items-stretch so both columns are forced to the exact same height */}
+          <div className="flex flex-col lg:flex-row gap-6 items-stretch w-full">
+
+            {/* Left Side: Schedule (Takes up more space) */}
+            <div className="w-full lg:w-[65%] shrink-0">
+              <Schedule />
+            </div>
+
+            {/* Right Side: Fee Payment (Sits in the corner) */}
+            <div className="w-full lg:w-[35%] shrink-0">
+              <FeePayment />
+            </div>
+
+          </div>
+        </div>
       </SidebarProvider>
     </>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, GraduationCap, BookOpen, ShieldCheck,
@@ -9,65 +10,73 @@ import {
 } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 
-// --- Types & Mock Data ---
-type Role = 'Student' | 'Lecturer' | 'Administrator';
-type Status = 'Active' | 'Suspended' | 'Pending' | 'Inactive';
-
-interface UserData {
+// --- Types Matching Your Prisma DB ---
+export interface UserData {
   id: string;
   name: string;
-  roleLabel: string;
-  matriculatiionNumber: string;
   email: string;
-  role: Role;
-  status: Status;
-  dateJoined: string;
-  initials: string;
+  role: 'STUDENT' | 'LECTURER' | 'ADMIN';
+  department: string;
 }
 
-// Generating 30 mock users with deterministic data to prevent hydration errors
-const mockUsers: UserData[] = Array.from({ length: 30 }).map((_, i) => ({
-  id: `USR${i + 1}`,
-  name: i === 0 ? 'Odumodu Black' : `User ${i + 1}`,
-  roleLabel: i % 3 === 0 ? 'Student' : i % 3 === 1 ? 'Lecturer' : 'Administrator',
-  matriculatiionNumber: i % 3 === 0 ? `INDUSTRYMACHINE00${i + 1}` : `LECT202300${i + 1}`,
-  email: `user${i + 1}@fuol.edu.ng`,
-  role: (i % 3 === 0 ? 'Student' : i % 3 === 1 ? 'Lecturer' : 'Administrator') as Role,
-  status: (i % 4 === 0 ? 'Active' : i % 4 === 1 ? 'Suspended' : i % 4 === 2 ? 'Pending' : 'Inactive') as Status,
-  dateJoined: `May ${(i % 28) + 1}, 2026`,
-  initials: i === 0 ? 'OB' : `U${i + 1}`
-}));
-
-export default function UserManagementPage() {
+export default function UserManagementClient({ initialUsers }: { initialUsers: UserData[] }) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-  const totalUsers = mockUsers.length;
-  const totalPages = Math.ceil(totalUsers / itemsPerPage);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
+  // Pagination Logic
+  const itemsPerPage = 8;
+  const totalUsers = initialUsers.length;
+  const totalPages = Math.ceil(totalUsers / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = mockUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentUsers = initialUsers.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Dynamic Stats Calculation
+  const studentsCount = initialUsers.filter(u => u.role === 'STUDENT').length;
+  const lecturersCount = initialUsers.filter(u => u.role === 'LECTURER').length;
+  const adminsCount = initialUsers.filter(u => u.role === 'ADMIN').length;
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const getRoleColor = (role: Role) => {
+  // Role Update API Call
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newRole }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update role');
+
+      // Instantly refresh the page data to show the new role
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert("Error updating role. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getRoleColor = (role: string) => {
     switch (role) {
-      case 'Student': return 'bg-indigo-50 text-indigo-700';
-      case 'Lecturer': return 'bg-orange-50 text-orange-700';
-      case 'Administrator': return 'bg-green-50 text-green-700';
+      case 'STUDENT': return 'bg-indigo-50 text-indigo-700';
+      case 'LECTURER': return 'bg-orange-50 text-orange-700';
+      case 'ADMIN': return 'bg-green-50 text-green-700';
       default: return 'bg-gray-50 text-gray-700';
     }
   };
 
-  const getStatusColor = (status: Status) => {
-    switch (status) {
-      case 'Active': return 'text-green-500';
-      case 'Suspended': return 'text-red-500';
-      case 'Pending': return 'text-yellow-500';
-      case 'Inactive': return 'text-gray-400';
-      default: return 'text-gray-500';
-    }
+  // Helper to generate initials from the dynamic names
+  const getInitials = (name: string) => {
+    if (!name || name === "Unknown") return "UN";
+    const parts = name.split(" ");
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   };
 
   return (
@@ -92,16 +101,16 @@ export default function UserManagementPage() {
         </button>
       </div>
 
-      {/* Stat Cards - Horizontally scrollable on mobile, grid on desktop */}
+      {/* Dynamic Stat Cards */}
       <div
         className="flex md:grid md:grid-cols-4 gap-4 mb-6 md:mb-8 overflow-x-auto pb-2 md:pb-0 snap-x"
-        style={{ scrollbarWidth: 'none' }} // Hides scrollbar on Firefox
+        style={{ scrollbarWidth: 'none' }}
       >
         {[
-          { title: 'Total Users', count: '128', sub: 'All registered users', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { title: 'Students', count: '98', sub: 'Active students', icon: GraduationCap, color: 'text-orange-500', bg: 'bg-orange-50' },
-          { title: 'Lecturers', count: '22', sub: 'Active lecturers', icon: BookOpen, color: 'text-orange-400', bg: 'bg-orange-50' },
-          { title: 'Administrators', count: '8', sub: 'System admins', icon: ShieldCheck, color: 'text-green-500', bg: 'bg-green-50' },
+          { title: 'Total Users', count: totalUsers, sub: 'All registered users', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+          { title: 'Students', count: studentsCount, sub: 'Active students', icon: GraduationCap, color: 'text-orange-500', bg: 'bg-orange-50' },
+          { title: 'Lecturers', count: lecturersCount, sub: 'Active lecturers', icon: BookOpen, color: 'text-orange-400', bg: 'bg-orange-50' },
+          { title: 'Administrators', count: adminsCount, sub: 'System admins', icon: ShieldCheck, color: 'text-green-500', bg: 'bg-green-50' },
         ].map((stat, idx) => (
           <motion.div
             key={idx}
@@ -125,27 +134,15 @@ export default function UserManagementPage() {
       {/* Filters & Search */}
       <div className="bg-white p-3 md:p-2 rounded-xl border border-gray-100 shadow-sm mb-6 flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
         <SearchBar />
-        <div
-          className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0"
-          style={{ scrollbarWidth: 'none' }}
-        >
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none' }}>
           <select className="border border-gray-200 rounded-lg text-sm px-3 py-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 shrink-0">
             <option>All Roles</option>
             <option>Student</option>
             <option>Lecturer</option>
             <option>Administrator</option>
           </select>
-          <select className="border border-gray-200 rounded-lg text-sm px-3 py-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 shrink-0">
-            <option>All Statuses</option>
-            <option>Active</option>
-            <option>Pending</option>
-            <option>Suspended</option>
-          </select>
           <button className="flex items-center gap-2 bg-[#0F172A] text-white px-4 py-2.5 rounded-lg text-sm font-medium shrink-0">
             <Filter className="w-4 h-4" /> Filter
-          </button>
-          <button className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 shrink-0">
-            <RotateCcw className="w-4 h-4" /> Reset
           </button>
         </div>
       </div>
@@ -158,31 +155,39 @@ export default function UserManagementPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: idx * 0.05 }}
-            className="p-4 flex items-center justify-between gap-2 hover:bg-gray-50/50 transition-colors"
+            className="p-4 flex flex-col gap-3 hover:bg-gray-50/50 transition-colors"
           >
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-medium text-sm shrink-0">
-                {user.initials}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-medium text-sm shrink-0">
+                  {getInitials(user.name)}
+                </div>
+                <div className="truncate">
+                  <p className="font-medium text-gray-900 text-sm truncate">{user.name}</p>
+                  <p className="text-xs text-gray-500 truncate mt-0.5">{user.department}</p>
+                </div>
               </div>
-              <div className="truncate">
-                <p className="font-medium text-gray-900 text-sm truncate">{user.name}</p>
-                <p className="text-xs text-gray-500 truncate mt-0.5">
-                  {user.roleLabel} &bull; {user.matriculatiionNumber}
-                </p>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full text-green-500 bg-current" />
+                <span className="text-xs font-medium text-green-500">Active</span>
               </div>
             </div>
-
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${getStatusColor(user.status)} bg-current`} />
-                <span className={`text-xs font-medium ${getStatusColor(user.status)}`}>{user.status}</span>
-              </div>
-              <button className="p-1 text-gray-400 hover:text-gray-900 border border-gray-100 rounded-md">
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Interactive Mobile Role Dropdown */}
+            <select
+              defaultValue={user.role}
+              disabled={isLoading}
+              onChange={(e) => handleRoleChange(user.id, e.target.value)}
+              className={`w-full mt-2 px-3 py-2 border rounded-lg text-xs font-medium focus:outline-none ${getRoleColor(user.role)}`}
+            >
+              <option value="STUDENT" className="bg-white text-gray-900">Student</option>
+              <option value="LECTURER" className="bg-white text-gray-900">Lecturer</option>
+              <option value="ADMIN" className="bg-white text-gray-900">Administrator</option>
+            </select>
           </motion.div>
         ))}
+        {currentUsers.length === 0 && (
+          <div className="p-8 text-center text-gray-500 text-sm">No users found in database.</div>
+        )}
       </div>
 
       {/* --- DESKTOP VIEW: Table Layout --- */}
@@ -192,11 +197,10 @@ export default function UserManagementPage() {
             <thead className="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
               <tr>
                 <th className="px-6 py-4">Name</th>
-                <th className="px-6 py-4">Matric No. / ID</th>
+                <th className="px-6 py-4">Department / ID</th>
                 <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Role Gate</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Date Joined</th>
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
@@ -205,27 +209,34 @@ export default function UserManagementPage() {
                 <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-medium text-sm">
-                      {user.initials}
+                      {getInitials(user.name)}
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{user.name}</p>
-                      <p className="text-xs text-gray-500">{user.roleLabel}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user.role.toLowerCase()}</p>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-500">{user.matriculatiionNumber}</td>
+                  <td className="px-6 py-4 text-gray-500">{user.department}</td>
                   <td className="px-6 py-4 text-gray-500">{user.email}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                      {user.role}
-                    </span>
+                    {/* The Interactive Dropdown hitting your API */}
+                    <select
+                      defaultValue={user.role}
+                      disabled={isLoading}
+                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold border-0 cursor-pointer focus:ring-2 focus:ring-indigo-500 appearance-none outline-none ${getRoleColor(user.role)}`}
+                    >
+                      <option value="STUDENT" className="bg-white text-gray-900">STUDENT</option>
+                      <option value="LECTURER" className="bg-white text-gray-900">LECTURER</option>
+                      <option value="ADMIN" className="bg-white text-gray-900">ADMINISTRATOR</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5">
-                      <div className={`w-2 h-2 rounded-full ${getStatusColor(user.status)} bg-current`} />
-                      <span className={`text-sm font-medium ${getStatusColor(user.status)}`}>{user.status}</span>
+                      <div className="w-2 h-2 rounded-full text-green-500 bg-current" />
+                      <span className="text-sm font-medium text-green-500">Active</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-500">{user.dateJoined}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
                       <button className="p-1.5 text-gray-400 hover:text-gray-900 border border-gray-200 rounded-md">
@@ -238,6 +249,13 @@ export default function UserManagementPage() {
                   </td>
                 </tr>
               ))}
+              {currentUsers.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    No users found. Create one to populate the system.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -262,8 +280,8 @@ export default function UserManagementPage() {
               key={index}
               onClick={() => paginate(index + 1)}
               className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg text-xs md:text-sm font-medium transition-colors ${currentPage === index + 1
-                  ? 'bg-[#0F172A] text-white'
-                  : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                ? 'bg-[#0F172A] text-white'
+                : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
                 }`}
             >
               {index + 1}
@@ -302,6 +320,7 @@ export default function UserManagementPage() {
                 </button>
               </div>
               <div className="p-4 md:p-5 space-y-3">
+                {/* Add your modal navigation/forms here later! */}
                 <button className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-left group">
                   <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg group-hover:bg-indigo-200"><GraduationCap className="w-5 h-5" /></div>
                   <div>

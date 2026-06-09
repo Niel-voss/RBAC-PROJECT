@@ -31,7 +31,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           throw new Error("Invalid credentials");
         }
 
-        // D. Compare passwords securely
+        // 🚀 D. THE DEFENSE DAY BYPASS 🚀
+        // This MUST happen before bcrypt so we don't crash on plain text passwords!
+        if (credentials.email === 'admin@oluku.edu.ng' && credentials.password === 'adminpassword123') {
+          return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+          };
+        }
+
+        // E. Compare passwords securely for EVERYONE ELSE
         const isPasswordValid = await bcrypt.compare(
           credentials.password as string,
           user.password
@@ -41,11 +51,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           throw new Error("Invalid credentials");
         }
 
-        // E. Log them in!
+        // F. Log normal users in!
         return {
           id: user.id,
           email: user.email,
-          role: user.role, // Essential for your RBAC logic!
+          role: user.role,
         };
       }
     })
