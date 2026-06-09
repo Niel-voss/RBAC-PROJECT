@@ -1,13 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { Role } from '@prisma/client';
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> } // 1. Update to Promise
 ) {
   try {
+    // 2. Await the params before using them!
+    const { id } = await params;
+
     // 1. The Iron Gate: Security Check
     const session = await auth();
     if (!session || !session.user || session.user.role !== 'ADMIN') {
@@ -15,7 +18,7 @@ export async function PATCH(
     }
 
     // Protect the Chief Admin from accidentally demoting themselves!
-    if (params.id === session.user.id) {
+    if (id === session.user.id) {
       return NextResponse.json({ error: "You cannot change your own role" }, { status: 400 });
     }
 
@@ -24,7 +27,7 @@ export async function PATCH(
 
     // 2. Fetch the current user to see what we are dealing with
     const currentUser = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         studentProfile: true,
         lecturerProfile: true,
@@ -39,17 +42,17 @@ export async function PATCH(
 
       // Step A: Wipe out the old profile cleanly using the actual Model names
       if (currentUser.role === Role.STUDENT && currentUser.studentProfile) {
-        await tx.student.delete({ where: { userId: params.id } });
+        await tx.student.delete({ where: { userId: id } });
       } else if (currentUser.role === Role.LECTURER && currentUser.lecturerProfile) {
-        await tx.lecturer.delete({ where: { userId: params.id } });
+        await tx.lecturer.delete({ where: { userId: id } });
       } else if (currentUser.role === Role.ADMIN && currentUser.adminProfile) {
-        await tx.admin.delete({ where: { userId: params.id } });
+        await tx.admin.delete({ where: { userId: id } });
       }
 
       // Step B: Update the base Role and create the new blank profile
       if (newRole === Role.STUDENT) {
         await tx.user.update({
-          where: { id: params.id },
+          where: { id: id },
           data: {
             role: Role.STUDENT,
             studentProfile: {
@@ -63,7 +66,7 @@ export async function PATCH(
         });
       } else if (newRole === Role.LECTURER) {
         await tx.user.update({
-          where: { id: params.id },
+          where: { id: id },
           data: {
             role: Role.LECTURER,
             lecturerProfile: {
@@ -76,7 +79,7 @@ export async function PATCH(
         });
       } else if (newRole === Role.ADMIN) {
         await tx.user.update({
-          where: { id: params.id },
+          where: { id: id },
           data: {
             role: Role.ADMIN,
             adminProfile: {
