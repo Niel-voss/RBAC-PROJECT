@@ -28,7 +28,7 @@ export default async function Home() {
   // 4. RBAC Check: Ensure this person is actually a student
   // (Prevents an Admin or Lecturer from trying to load the student dashboard)
   if (!currentUser || currentUser.role !== "STUDENT") {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   // Safely extract the student profile data
