@@ -13,8 +13,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isAuthPage =
     pathname === "/auth/signUp" ||
     pathname === "/auth/login" ||
+    pathname === "/unauthorized" ||
+    pathname === "/auth/lecturer-login" ||
     pathname === "/terms" || // <-- Added Terms
     pathname === "/";
+
 
   // Extract the role from the URL (e.g., /student/dashboard -> "student")
   const pathSegments = pathname.split('/');

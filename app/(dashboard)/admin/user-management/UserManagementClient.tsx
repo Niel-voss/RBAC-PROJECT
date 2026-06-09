@@ -25,18 +25,19 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
-  // --- 1. PIN THE CHIEF ADMINISTRATOR ---
+  // --- NEW: Form State for User Creation ---
+  const [selectedRole, setSelectedRole] = useState<'STUDENT' | 'LECTURER' | 'ADMIN' | null>(null);
+  const [formData, setFormData] = useState({ name: '', email: '', department: '', password: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Sort the users so the demo admin is ALWAYS at the top.
   const sortedUsers = [...initialUsers].sort((a, b) => {
-    // If 'a' is the admin email, it goes to the top (-1)
     if (a.email === 'admin@oluku.edu.ng') return -1;
-    // If 'b' is the admin email, it goes to the top (1)
     if (b.email === 'admin@oluku.edu.ng') return 1;
-    // Otherwise, keep their natural order (or you could sort alphabetically by name here)
     return 0;
   });
 
-  // Pagination Logic (Now using the sorted array)
+  // Pagination Logic
   const itemsPerPage = 8;
   const totalUsers = sortedUsers.length;
   const totalPages = Math.ceil(totalUsers / itemsPerPage) || 1;
@@ -50,6 +51,42 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
   const adminsCount = initialUsers.filter(u => u.role === 'ADMIN').length;
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // --- NEW: User Creation Handler ---
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRole) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, role: selectedRole }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to create user');
+      }
+
+      // Reset form, close modal, and instantly refresh the table!
+      setFormData({ name: '', email: '', department: '', password: '' });
+      setSelectedRole(null);
+      setIsAddUserModalOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      // Type Narrowing: Check if it's a standard Error object
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Error creating user. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Role Update API Call
   const handleRoleChange = async (userId: string, newRole: string) => {
@@ -71,14 +108,12 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
     }
   };
 
-  // --- 2. COLOR CODING (Matching Reference UI) ---
-
   // Colors for the Role Badge
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'STUDENT': return 'bg-indigo-50 text-[#1E3A8A] border border-indigo-100'; // Dark Blue text, light bg
-      case 'LECTURER': return 'bg-orange-50 text-[#EA580C] border border-orange-100'; // Orange text, light bg
-      case 'ADMIN': return 'bg-green-50 text-[#16A34A] border border-green-100';     // Green text, light bg
+      case 'STUDENT': return 'bg-indigo-50 text-[#1E3A8A] border border-indigo-100';
+      case 'LECTURER': return 'bg-orange-50 text-[#EA580C] border border-orange-100';
+      case 'ADMIN': return 'bg-green-50 text-[#16A34A] border border-green-100';
       default: return 'bg-gray-50 text-gray-700';
     }
   };
@@ -86,19 +121,26 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
   // Colors for the Circular Avatar Initial
   const getAvatarColor = (role: string) => {
     switch (role) {
-      case 'STUDENT': return 'bg-[#0B173D] text-white'; // The Navy Blue from the UI
-      case 'LECTURER': return 'bg-[#EA580C] text-white'; // The Orange from the UI
-      case 'ADMIN': return 'bg-[#1E293B] text-white';    // Very dark gray/black for Admin
+      case 'STUDENT': return 'bg-[#0B173D] text-white';
+      case 'LECTURER': return 'bg-[#EA580C] text-white';
+      case 'ADMIN': return 'bg-[#1E293B] text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
 
-  // Helper to generate initials from the dynamic names
+  // Helper to generate initials
   const getInitials = (name: string) => {
     if (!name || name === "Unknown") return "UN";
     const parts = name.split(" ");
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return name.substring(0, 2).toUpperCase();
+  };
+
+  // Helper to reset modal completely
+  const closeAndResetModal = () => {
+    setIsAddUserModalOpen(false);
+    setSelectedRole(null);
+    setFormData({ name: '', email: '', department: '', password: '' });
   };
 
   return (
@@ -181,7 +223,6 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
           >
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-3 overflow-hidden">
-                {/* Applied Dynamic Avatar Color */}
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm shrink-0 ${getAvatarColor(user.role)}`}>
                   {getInitials(user.name)}
                 </div>
@@ -197,7 +238,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
             </div>
             <select
               defaultValue={user.role}
-              disabled={isLoading || user.email === 'admin@oluku.edu.ng'} // Prevent locking yourself out!
+              disabled={isLoading || user.email === 'admin@oluku.edu.ng'}
               onChange={(e) => handleRoleChange(user.id, e.target.value)}
               className={`w-full mt-2 px-3 py-2 rounded-lg text-xs font-medium focus:outline-none ${getRoleColor(user.role)}`}
             >
@@ -230,7 +271,6 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
               {currentUsers.map((user, idx) => (
                 <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 flex items-center gap-3">
-                    {/* Applied Dynamic Avatar Color */}
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm ${getAvatarColor(user.role)}`}>
                       {getInitials(user.name)}
                     </div>
@@ -244,7 +284,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                   <td className="px-6 py-4">
                     <select
                       defaultValue={user.role}
-                      disabled={isLoading || user.email === 'admin@oluku.edu.ng'} // Prevent locking yourself out!
+                      disabled={isLoading || user.email === 'admin@oluku.edu.ng'}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
                       className={`px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer focus:ring-2 focus:ring-indigo-500 appearance-none outline-none ${getRoleColor(user.role)}`}
                     >
@@ -327,7 +367,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -335,34 +375,102 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden"
             >
-              <div className="p-4 md:p-5 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-semibold text-gray-900">Select User Role</h3>
-                <button onClick={() => setIsAddUserModalOpen(false)} className="text-gray-400 hover:text-gray-700">
+              <div className="p-4 md:p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 className="font-semibold text-gray-900">
+                  {selectedRole ? `Register New ${selectedRole.charAt(0) + selectedRole.slice(1).toLowerCase()}` : 'Select User Role'}
+                </h3>
+                <button onClick={closeAndResetModal} className="text-gray-400 hover:text-gray-700 bg-white rounded-full p-1 shadow-sm">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-4 md:p-5 space-y-3">
-                <button className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-left group">
-                  <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg group-hover:bg-indigo-200"><GraduationCap className="w-5 h-5" /></div>
-                  <div>
-                    <p className="font-medium text-gray-900 text-sm md:text-base">Student</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">Register a new student account</p>
+
+              <div className="p-4 md:p-5 space-y-4">
+                {/* VIEW 1: Role Selection */}
+                {!selectedRole ? (
+                  <div className="space-y-3">
+                    <button onClick={() => setSelectedRole('STUDENT')} className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-left group">
+                      <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg group-hover:bg-indigo-200"><GraduationCap className="w-5 h-5" /></div>
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm md:text-base">Student</p>
+                        <p className="text-[10px] md:text-xs text-gray-500">Register a new student account</p>
+                      </div>
+                    </button>
+                    <button onClick={() => setSelectedRole('LECTURER')} className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-colors text-left group">
+                      <div className="p-2 bg-orange-100 text-orange-700 rounded-lg group-hover:bg-orange-200"><BookOpen className="w-5 h-5" /></div>
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm md:text-base">Lecturer</p>
+                        <p className="text-[10px] md:text-xs text-gray-500">Register a new faculty member</p>
+                      </div>
+                    </button>
+                    <button onClick={() => setSelectedRole('ADMIN')} className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-colors text-left group">
+                      <div className="p-2 bg-green-100 text-green-700 rounded-lg group-hover:bg-green-200"><ShieldCheck className="w-5 h-5" /></div>
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm md:text-base">Administrator</p>
+                        <p className="text-[10px] md:text-xs text-gray-500">Create a system admin account</p>
+                      </div>
+                    </button>
                   </div>
-                </button>
-                <button className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-colors text-left group">
-                  <div className="p-2 bg-orange-100 text-orange-700 rounded-lg group-hover:bg-orange-200"><BookOpen className="w-5 h-5" /></div>
-                  <div>
-                    <p className="font-medium text-gray-900 text-sm md:text-base">Lecturer</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">Register a new faculty member</p>
-                  </div>
-                </button>
-                <button className="w-full flex items-center gap-3 p-3 md:p-4 border border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-colors text-left group">
-                  <div className="p-2 bg-green-100 text-green-700 rounded-lg group-hover:bg-green-200"><ShieldCheck className="w-5 h-5" /></div>
-                  <div>
-                    <p className="font-medium text-gray-900 text-sm md:text-base">Administrator</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">Create a system admin account</p>
-                  </div>
-                </button>
+                ) : (
+                  <form onSubmit={handleCreateUser} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Full Name</label>
+                      <input
+                        type="text" required
+                        value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                        placeholder={selectedRole === 'LECTURER' ? 'e.g. Prof. Adewale' : 'e.g. John Doe'}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
+                      <input
+                        type="email" required
+                        value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                        placeholder="john@oluku.edu.ng"
+                      />
+                    </div>
+                    {selectedRole !== 'ADMIN' && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          {selectedRole === 'LECTURER' ? 'Assigned Course / Department' : 'Department'}
+                        </label>
+                        <input
+                          type="text" required
+                          value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                          placeholder="e.g. Computer Science"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Temporary Password</label>
+                      <input
+                        type="password" required minLength={6}
+                        value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                        placeholder="••••••••"
+                      />
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRole(null)}
+                        className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#0B173D] rounded-lg hover:bg-[#1a2b5e] transition-colors disabled:opacity-50"
+                      >
+                        {isSubmitting ? 'Creating...' : 'Create User'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </motion.div>
           </motion.div>

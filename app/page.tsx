@@ -23,7 +23,7 @@ export default function LandingPage() {
         <Link href="/auth/signUp" className="px-6 py-2 bg-[#0B173D] text-white rounded-lg">
           Student Portal
         </Link>
-        <Link href="/lecturer" className="px-6 py-2 bg-orange-500 text-white rounded-lg">
+        <Link href="/auth/lecturer-login" className="px-6 py-2 bg-orange-500 text-white rounded-lg">
           Lecturer Portal
         </Link>
       </div>
