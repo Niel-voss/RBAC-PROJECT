@@ -5,10 +5,9 @@ import { Role } from '@prisma/client';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // 1. Update to Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 2. Await the params before using them!
     const { id } = await params;
 
     // 1. The Iron Gate: Security Check
@@ -37,10 +36,21 @@ export async function PATCH(
 
     if (!currentUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    // --- THE FIX ---
+    // Extract the name from their current active profile
+    let baseName = "Unknown User";
+    if (currentUser.role === Role.STUDENT && currentUser.studentProfile) {
+      baseName = currentUser.studentProfile.studentName;
+    } else if (currentUser.role === Role.LECTURER && currentUser.lecturerProfile) {
+      baseName = currentUser.lecturerProfile.lecturerName;
+    } else if (currentUser.role === Role.ADMIN && currentUser.adminProfile) {
+      baseName = currentUser.adminProfile.adminName;
+    }
+
     // 3. The Complex Switch (Transactions ensure it all succeeds or all fails)
     await prisma.$transaction(async (tx) => {
 
-      // Step A: Wipe out the old profile cleanly using the actual Model names
+      // Step A: Wipe out the old profile cleanly
       if (currentUser.role === Role.STUDENT && currentUser.studentProfile) {
         await tx.student.delete({ where: { userId: id } });
       } else if (currentUser.role === Role.LECTURER && currentUser.lecturerProfile) {
@@ -49,7 +59,7 @@ export async function PATCH(
         await tx.admin.delete({ where: { userId: id } });
       }
 
-      // Step B: Update the base Role and create the new blank profile
+      // Step B: Update the base Role and create the new profile using the extracted baseName
       if (newRole === Role.STUDENT) {
         await tx.user.update({
           where: { id: id },
@@ -57,7 +67,7 @@ export async function PATCH(
             role: Role.STUDENT,
             studentProfile: {
               create: {
-                studentName: "Pending Setup",
+                studentName: baseName, // Applied here
                 department: "Unassigned",
                 matriculationNumber: `MAT-${Date.now()}`
               }
@@ -71,7 +81,7 @@ export async function PATCH(
             role: Role.LECTURER,
             lecturerProfile: {
               create: {
-                lecturerName: "Pending Setup",
+                lecturerName: baseName, // Applied here
                 course: "Unassigned",
               }
             }
@@ -84,7 +94,7 @@ export async function PATCH(
             role: Role.ADMIN,
             adminProfile: {
               create: {
-                adminName: "Pending Setup",
+                adminName: baseName, // Applied here
               }
             }
           }
