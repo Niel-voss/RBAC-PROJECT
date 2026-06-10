@@ -12,6 +12,7 @@ import {
   Mail,
   IdCard,
   Lock,
+  Info
 } from 'lucide-react';
 
 export default function CreateAccountMicro() {
@@ -167,7 +168,7 @@ export default function CreateAccountMicro() {
             name="matricNumber"
             value={formData.matricNumber}
             onChange={handleChange}
-            placeholder="Enter your Mat no"
+            placeholder="Enter your Mat no."
             hint="Must begin with capital letters"
             icon={<IdCard />}
           />
@@ -202,9 +203,21 @@ export default function CreateAccountMicro() {
 
         </form>
 
-        <p className="text-center text-[11px] text-slate-500 mt-5">
-          Already have an account? <Link href="/auth/login" className="text-[#0a1845] font-semibold hover:underline">Login</Link>
-        </p>
+        <div className="mt-6 flex flex-col items-center gap-3">
+          {/* Primary secondary-action */}
+          <p className="text-center text-[13px] text-slate-600">
+            Already have an account?{' '}
+            <Link href="/auth/login" className="text-[#0a1845] font-semibold hover:underline">
+              Log in
+            </Link>
+          </p>
+
+          {/* Muted contextual hint */}
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+            <Info size={12} className="flex-shrink-0" />
+            <span>Demo credentials available on the login page.</span>
+          </div>
+        </div>
 
       </div>
     </div>

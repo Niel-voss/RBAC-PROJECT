@@ -11,6 +11,8 @@ import InputField from "@/components/InputField";
 import {
   Mail,
   Lock,
+  Lightbulb,
+  SquarePen,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -26,6 +28,14 @@ export default function LoginPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleDemoFill = () => {
+    setFormData({
+      email: "mark001@gmail.com",
+      password: "demo_password_123",
+    });
+    setError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,7 +73,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center p-4 font-sans">
       <div className="w-full max-w-[340px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-7">
 
         <div className="flex flex-col items-center mb-5">
@@ -121,11 +131,37 @@ export default function LoginPage() {
 
         </form>
 
-        <p className="text-center text-[11px] text-slate-500 mt-5">
-          Don&apos;t have an account? <Link href="/auth/signUp" className="text-[#0a1845] font-semibold hover:underline">create account</Link>
-        </p>
+        {/* --- ADDED UI SECTION --- */}
+        <div className="flex items-center my-5">
+          <div className="flex-grow border-t border-slate-200"></div>
+          <span className="px-3 text-slate-800 text-[12px]">or</span>
+          <div className="flex-grow border-t border-slate-200"></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleDemoFill}
+          className="w-full flex items-center justify-center gap-2 bg-blue-50/50 hover:bg-blue-50 text-[#285b9b] border border-blue-200/80 rounded-lg py-2.5 text-[13px] font-medium transition-colors mb-5"
+        >
+          <SquarePen size={16} />
+          Fill Demo Student Credentials ⏩
+        </button>
+
+        <div className="flex items-start justify-center gap-2 text-slate-800">
+          <Lightbulb size={16} className="mt-0.5 flex-shrink-0 text-[#285b9b]" />
+          <p className="text-[11px] leading-tight pt-0.5">
+            Want to explore quickly? Use the demo credentials button.
+          </p>
+        </div>
+        {/* --- END OF ADDED UI SECTION --- */}
 
       </div>
+
+      {/* Moved slightly below the card to perfectly match the provided image layout */}
+      <p className="text-center text-[13px] text-slate-700 mt-6">
+        Don&apos;t have an account? <Link href="/auth/signUp" className="text-[#0a1845] font-semibold hover:underline">create account</Link>
+      </p>
+
     </div>
   );
 }
