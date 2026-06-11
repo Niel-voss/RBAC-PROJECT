@@ -68,7 +68,7 @@ export async function PATCH(
             studentProfile: {
               create: {
                 studentName: baseName, // Applied here
-                department: "Unassigned",
+                department: "Computer Science",
                 matriculationNumber: `MAT-${Date.now()}`
               }
             }
