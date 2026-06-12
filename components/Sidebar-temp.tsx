@@ -32,7 +32,7 @@ export default function Sidebar({ role }: SidebarProps) {
     { name: 'My Courses', icon: BookOpen, path: '/my-courses', allowedRoles: ['lecturer'] },
     { name: 'Grade Management', icon: ClipboardList, path: '/grade-management', allowedRoles: ['lecturer'] },
     { name: 'Attendance Tracker', icon: User, path: '/attendance-tracker', allowedRoles: ['lecturer'] },
-    { name: 'Timetable', icon: Calendar, path: '/timetable', allowedRoles: ['lecturer'] }, // Duplicate name is fine, role filters it
+    { name: 'Schedules', icon: Calendar, path: '/schedules', allowedRoles: ['lecturer'] }, // Duplicate name is fine, role filters it
 
     // --- ADMIN SPECIFIC ---
     { name: 'User Management', icon: Users, path: '/user-management', allowedRoles: ['admin'] },

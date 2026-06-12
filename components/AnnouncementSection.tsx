@@ -50,7 +50,7 @@ export const AnnouncementSection = () => {
       {/* --- Left Column: Schedule Grid --- */}
       <motion.div variants={itemVariants} className="xl:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h2 className="text-xl font-bold text-[#0B173D]">Schedule</h2>
+          <h2 className="text-xl font-bold text-[#0B173D]">TimeTable</h2>
           <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
             <span className="text-sm font-medium text-gray-600">June 01 – 05</span>
             <div className="flex bg-gray-100 p-1 rounded-lg">

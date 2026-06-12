@@ -8,6 +8,9 @@ import Schedule from "@/components/Schedule";
 import { SidebarProvider } from "@/components/SidebarContext";
 import FeePayment from "@/components/FeePayment";
 
+// 👉 ADD THIS LINE: This forces Next.js to fetch fresh database data every single time the student opens the page
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // 1. Get the current logged-in session
   const session = await auth();
@@ -21,7 +24,7 @@ export default async function Home() {
   const currentUser = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
-      studentProfile: true, // This brings in the name, matric number, and department
+      studentProfile: true, // This brings in the name, matric number, department, AND cgpa!
     },
   });
 
@@ -31,8 +34,11 @@ export default async function Home() {
     redirect("/auth/login");
   }
 
-  // Safely extract the student profile data
+  // 5. Safely extract the student profile data
   const student = currentUser.studentProfile;
+
+  // Extract the CGPA, defaulting to 0.0 if it hasn't been set yet
+  const currentCgpa = student?.cgpa ?? 0.0;
 
   return (
     <>
@@ -45,11 +51,11 @@ export default async function Home() {
           <WelcomeBanner
             name={student?.studentName || "Student"}
             matricNumber={student?.matriculationNumber || "N/A"}
-            department={student?.department || "Unassigned"}
           />
 
           {/* ROW 2: Stats Cards */}
-          <DashboardStats />
+          {/* We pass the extracted CGPA right here! */}
+          <DashboardStats studentCgpa={currentCgpa} />
 
           {/* ROW 3: Schedule & Fee Payment */}
           {/* Changed to items-stretch so both columns are forced to the exact same height */}

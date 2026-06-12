@@ -24,6 +24,16 @@ export default function LayoutWrapper({ children, userName, userRole }: LayoutWr
     pathname === "/terms" ||
     pathname === "/";
 
+  // Check if they are technically on a route they shouldn't be on
+  // (Meaning your middleware rewrite has secretly swapped the content to the 403 page)
+  const isEffectivelyUnauthorized =
+    (pathname.startsWith('/admin') && userRole !== 'admin') ||
+    (pathname.startsWith('/lecturer') && userRole !== 'lecturer') ||
+    (pathname.startsWith('/student') && userRole !== 'student');
+
+  // Combine both checks
+  const hideLayout = isAuthPage || isEffectivelyUnauthorized;
+
   // Extract the role from the URL (e.g., /student/dashboard -> "student")
   const pathSegments = pathname.split('/');
 
@@ -32,8 +42,8 @@ export default function LayoutWrapper({ children, userName, userRole }: LayoutWr
     ? pathSegments[1]
     : 'student';
 
-  // If it's the signup or login page, just render the plain content
-  if (isAuthPage) {
+  // If it's an auth page OR an unauthorized route block, just render the plain content
+  if (hideLayout) {
     return (
       <main className="flex-1 h-screen overflow-y-auto bg-slate-50">
         {children}

@@ -115,8 +115,8 @@ const CourseRegistrationContent = () => {
           <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 pointer-events-none" />
         </div>
 
-        {/* Orange Accent Applied to Filter Button */}
-        <button className="flex items-center gap-2 bg-[#f97316] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-[#ea580c] transition-colors shadow-sm shadow-orange-500/20">
+        {/* Dark Blue Accent Applied to Filter Button */}
+        <button className="flex items-center gap-2 bg-[#0f172a] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm shadow-slate-800/20">
           <Filter className="w-4 h-4" />
           Filter
         </button>
@@ -133,11 +133,11 @@ const CourseRegistrationContent = () => {
           return (
             <button
               key={tab}
-              className={`pb-3 text-sm font-medium relative ${isActive ? 'text-[#f97316]' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`pb-3 text-sm font-medium relative ${isActive ? 'text-[#0f172a]' : 'text-gray-500 hover:text-gray-700'}`}
             >
               {tab}
               {isActive && (
-                <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[#f97316] rounded-t-full"></div>
+                <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[#0f172a] rounded-t-full"></div>
               )}
             </button>
           )
@@ -245,8 +245,8 @@ const CourseRegistrationContent = () => {
                 <p className="text-[10px] text-gray-400">Maximum: 24 units</p>
               </div>
               <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                {/* Orange Accent Applied to Progress Bar */}
-                <div className="h-full bg-[#f97316] rounded-full" style={{ width: '75%' }}></div>
+                {/* Dark Blue Accent Applied to Progress Bar */}
+                <div className="h-full bg-[#0f172a] rounded-full" style={{ width: '75%' }}></div>
               </div>
             </div>
 
@@ -268,8 +268,8 @@ const CourseRegistrationContent = () => {
               </div>
             </div>
 
-            {/* Orange Accent Applied to Primary Action */}
-            <button className="w-full flex items-center justify-center gap-2 bg-[#f97316] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#ea580c] transition-colors shadow-md shadow-orange-500/20">
+            {/* Dark Blue Accent Applied to Primary Action */}
+            <button className="w-full flex items-center justify-center gap-2 bg-[#0f172a] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors shadow-md shadow-slate-800/20">
               <Check className="w-4 h-4" />
               Confirm Registration
             </button>

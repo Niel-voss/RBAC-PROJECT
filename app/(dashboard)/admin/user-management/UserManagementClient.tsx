@@ -1,14 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, GraduationCap, BookOpen, ShieldCheck,
   Filter, RotateCcw, Edit2, MoreVertical,
-  ChevronLeft, ChevronRight, Plus, X
+  ChevronLeft, ChevronRight, Plus, X, Search
 } from 'lucide-react';
-import SearchBar from '@/components/SearchBar';
 
 // --- Types Matching Your Prisma DB ---
 export interface UserData {
@@ -22,37 +21,60 @@ export interface UserData {
 export default function UserManagementClient({ initialUsers }: { initialUsers: UserData[] }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
-  // --- NEW: Form State for User Creation ---
+  // --- NEW: Search & Pagination State ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // --- Form State for User Creation ---
   const [selectedRole, setSelectedRole] = useState<'STUDENT' | 'LECTURER' | 'ADMIN' | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', department: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sort the users so the demo admin is ALWAYS at the top.
-  const sortedUsers = [...initialUsers].sort((a, b) => {
-    if (a.email === 'admin@oluku.edu.ng') return -1;
-    if (b.email === 'admin@oluku.edu.ng') return 1;
-    return 0;
-  });
+  // 1. Sort the users so the demo admin is ALWAYS at the top.
+  const sortedUsers = useMemo(() => {
+    return [...initialUsers].sort((a, b) => {
+      if (a.email === 'admin@oluku.edu.ng') return -1;
+      if (b.email === 'admin@oluku.edu.ng') return 1;
+      return 0;
+    });
+  }, [initialUsers]);
 
-  // Pagination Logic
-  const itemsPerPage = 8;
-  const totalUsers = sortedUsers.length;
+  // 2. Handle Search Input
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to page 1 whenever they type a new search
+  };
+
+  // 3. OPTIMIZED FILTERING
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return sortedUsers;
+
+    const lowercasedQuery = searchQuery.toLowerCase();
+    return sortedUsers.filter((user) =>
+      user.name.toLowerCase().includes(lowercasedQuery) ||
+      user.email.toLowerCase().includes(lowercasedQuery) ||
+      user.department.toLowerCase().includes(lowercasedQuery)
+    );
+  }, [sortedUsers, searchQuery]);
+
+  // 4. PAGINATION MATH (Based on Filtered Results)
+  const totalUsers = filteredUsers.length;
   const totalPages = Math.ceil(totalUsers / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Dynamic Stats Calculation
+  // Dynamic Stats Calculation (Always based on total DB users, not the search)
   const studentsCount = initialUsers.filter(u => u.role === 'STUDENT').length;
   const lecturersCount = initialUsers.filter(u => u.role === 'LECTURER').length;
   const adminsCount = initialUsers.filter(u => u.role === 'ADMIN').length;
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // --- NEW: User Creation Handler ---
+  // --- User Creation Handler ---
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRole) return;
@@ -77,7 +99,6 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
       router.refresh();
     } catch (error) {
       console.error(error);
-      // Type Narrowing: Check if it's a standard Error object
       if (error instanceof Error) {
         alert(error.message);
       } else {
@@ -171,7 +192,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
         style={{ scrollbarWidth: 'none' }}
       >
         {[
-          { title: 'Total Users', count: totalUsers, sub: 'All registered users', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+          { title: 'Total Users', count: initialUsers.length, sub: 'All registered users', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
           { title: 'Students', count: studentsCount, sub: 'Active students', icon: GraduationCap, color: 'text-orange-500', bg: 'bg-orange-50' },
           { title: 'Lecturers', count: lecturersCount, sub: 'Active lecturers', icon: BookOpen, color: 'text-orange-400', bg: 'bg-orange-50' },
           { title: 'Administrators', count: adminsCount, sub: 'System admins', icon: ShieldCheck, color: 'text-green-500', bg: 'bg-green-50' },
@@ -197,9 +218,21 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
 
       {/* Filters & Search */}
       <div className="bg-white p-3 md:p-2 rounded-xl border border-gray-100 shadow-sm mb-6 flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
-        <SearchBar />
+
+        {/* 🚀 THE FIXED SEARCH BAR 🚀 */}
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search by name, email, or dept..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="w-full pl-9 pr-4 py-2.5 text-sm text-gray-900 bg-white placeholder:text-gray-400 border border-gray-200 rounded-lg outline-none focus:border-[#0B173D] focus:ring-1 focus:ring-[#0B173D] transition-all"
+          />
+        </div>
+
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none' }}>
-          <select className="border border-gray-200 rounded-lg text-sm px-3 py-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 shrink-0">
+          <select className="border border-gray-200 rounded-lg text-sm px-3 py-2.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 shrink-0">
             <option>All Roles</option>
             <option>Student</option>
             <option>Lecturer</option>
@@ -249,7 +282,9 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
           </motion.div>
         ))}
         {currentUsers.length === 0 && (
-          <div className="p-8 text-center text-gray-500 text-sm">No users found in database.</div>
+          <div className="p-8 text-center text-gray-500 text-sm">
+            {searchQuery ? "No users found matching your search." : "No users found in database."}
+          </div>
         )}
       </div>
 
@@ -314,7 +349,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
               {currentUsers.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    No users found. Create one to populate the system.
+                    {searchQuery ? "No users found matching your search." : "No users found. Create one to populate the system."}
                   </td>
                 </tr>
               )}
@@ -324,41 +359,43 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <p className="text-xs md:text-sm text-gray-500">
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, totalUsers)} of {totalUsers} users
-        </p>
-        <div className="flex items-center gap-1 overflow-x-auto">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="p-1.5 md:p-2 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          {[...Array(totalPages)].map((_, index) => (
+      {totalPages > 0 && (
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs md:text-sm text-gray-500">
+            Showing <span className="font-medium text-gray-900">{indexOfFirstItem + 1}</span> to <span className="font-medium text-gray-900">{Math.min(indexOfLastItem, totalUsers)}</span> of <span className="font-medium text-gray-900">{totalUsers}</span> users
+          </p>
+          <div className="flex items-center gap-1 overflow-x-auto">
             <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg text-xs md:text-sm font-medium transition-colors ${currentPage === index + 1
-                ? 'bg-[#0F172A] text-white'
-                : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 md:p-2 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-50"
             >
-              {index + 1}
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          ))}
 
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="p-1.5 md:p-2 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg text-xs md:text-sm font-medium transition-colors ${currentPage === index + 1
+                  ? 'bg-[#0F172A] text-white'
+                  : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 md:p-2 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Add User Modal */}
       <AnimatePresence>
@@ -417,7 +454,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                       <input
                         type="text" required
                         value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm text-gray-900"
                         placeholder={selectedRole === 'LECTURER' ? 'e.g. Prof. Adewale' : 'e.g. John Doe'}
                       />
                     </div>
@@ -426,7 +463,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                       <input
                         type="email" required
                         value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm text-gray-900"
                         placeholder="john@oluku.edu.ng"
                       />
                     </div>
@@ -438,7 +475,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                         <input
                           type="text" required
                           value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm text-gray-900"
                           placeholder="e.g. Computer Science"
                         />
                       </div>
@@ -448,7 +485,7 @@ export default function UserManagementClient({ initialUsers }: { initialUsers: U
                       <input
                         type="password" required minLength={6}
                         value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B173D] text-sm text-gray-900"
                         placeholder="••••••••"
                       />
                     </div>

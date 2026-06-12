@@ -6,14 +6,13 @@ import { motion } from "framer-motion";
 interface WelcomeBannerProps {
   name: string;
   matricNumber: string;
-  department: string;
   level?: string; // Optional, defaults to "400 Level" if not provided
 }
 
 export default function WelcomeBanner({
   name,
   matricNumber,
-  department,
+
   level = "400 Level - Semester 2"
 }: WelcomeBannerProps) {
 
@@ -39,7 +38,7 @@ export default function WelcomeBanner({
             Matric {matricNumber}
           </span>
           <span className="px-2 py-0.5 bg-[#25419A] text-white text-[10px] font-medium rounded-full shadow-inner border border-white/5">
-            {department}
+            Computer Science
           </span>
           <span className="px-2 py-0.5 bg-[#25419A] text-white text-[10px] font-medium rounded-full shadow-inner border border-white/5">
             {level}

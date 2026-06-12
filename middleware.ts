@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
+import { NextResponse } from "next/server";
 
 const { auth } = NextAuth(authConfig);
 
@@ -24,16 +25,16 @@ export default auth((req) => {
     return Response.redirect(new URL('/auth/login', nextUrl));
   }
 
-  //  AUTHORIZATION (If logged in, check if they belong in the current URL)
+  // AUTHORIZATION (If logged in, check if they belong in the current URL)
   if (isLoggedIn && isProtectedRoute) {
     if (isAdminRoute && role !== 'ADMIN') {
-      return Response.redirect(new URL('/unauthorized', nextUrl));
+      return NextResponse.rewrite(new URL('/unauthorized', nextUrl), { status: 403 });
     }
     if (isLecturerRoute && role !== 'LECTURER') {
-      return Response.redirect(new URL('/unauthorized', nextUrl));
+      return NextResponse.rewrite(new URL('/unauthorized', nextUrl), { status: 403 });
     }
     if (isStudentRoute && role !== 'STUDENT') {
-      return Response.redirect(new URL('/unauthorized', nextUrl));
+      return NextResponse.rewrite(new URL('/unauthorized', nextUrl), { status: 403 });
     }
   }
 

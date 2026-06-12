@@ -1,5 +1,6 @@
 "use client";
 
+import CalendarAndEvents from "@/components/CalendarAndEvents"; // 🚀 1. Import the new Calendar & Events component
 import React from "react";
 import { motion } from "framer-motion";
 import {
@@ -208,44 +209,7 @@ export default function AdminDashboardClient({ studentCount, lecturerCount, admi
           </motion.div>
 
           {/* Right Column: Calendar & Events */}
-          <div className="lg:col-span-3 space-y-6">
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-gray-400 cursor-pointer">{"<<"}</span>
-                <span className="text-gray-400 cursor-pointer">{"<"}</span>
-                <h3 className="font-bold text-[#0B173D]">June 2026</h3>
-                <span className="text-gray-400 cursor-pointer">{">"}</span>
-                <span className="text-gray-400 cursor-pointer">{">>"}</span>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-gray-400 mb-2">
-                <div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div className="text-[#0B173D]">SAT</div><div className="text-[#0B173D]">SUN</div>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-gray-600">
-                <div className="py-1.5">1</div><div className="py-1.5">2</div><div className="py-1.5">3</div><div className="py-1.5">4</div><div className="py-1.5">5</div><div className="text-orange-500 py-1.5">6</div><div className="text-orange-500 py-1.5">7</div>
-                <div className="py-1.5">8</div><div className="bg-[#0B173D] text-white rounded-full py-1.5 shadow-md">9</div><div className="py-1.5">10</div><div className="py-1.5">11</div><div className="py-1.5">12</div><div className="text-orange-500 py-1.5">13</div><div className="text-orange-500 py-1.5">14</div>
-                <div className="py-1.5">15</div><div className="py-1.5">16</div><div className="py-1.5">17</div><div className="py-1.5">18</div><div className="py-1.5">19</div><div className="text-orange-500 py-1.5">20</div><div className="text-orange-500 py-1.5">21</div>
-                <div className="py-1.5">22</div><div className="py-1.5">23</div><div className="py-1.5">24</div><div className="py-1.5">25</div><div className="py-1.5">26</div><div className="text-orange-500 py-1.5">27</div><div className="text-orange-500 py-1.5">28</div>
-                <div className="py-1.5">29</div><div className="py-1.5">30</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex-1">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-[#0B173D]">Events</h2>
-                <MoreHorizontal size={20} className="text-gray-400 cursor-pointer" />
-              </div>
-              <div className="space-y-4">
-                {eventsData.map((event) => (
-                  <div key={event.id} className={`border-t-4 ${event.border} bg-gray-50 rounded-lg p-3 pt-4 relative`}>
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="font-bold text-[#0B173D] text-sm">{event.title}</h4>
-                      <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">{event.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
+          <CalendarAndEvents />
 
         </div>
       </motion.div>

@@ -1,10 +1,13 @@
 "use server";
 
-// 1. Corrected import: Pointing to your singleton Prisma client in the lib folder
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { auth } from "@/auth"; // <-- Add this import for RBAC checks!
+import { revalidatePath } from "next/cache"; // <-- Add this to refresh the page after updating
 
-// 2. Define the exact shape of the incoming form data
+// ==========================================
+// 1. YOUR EXISTING ADMIN REGISTER FUNCTION
+// ==========================================
 interface RegisterFormData {
   name: string;
   email: string;
@@ -12,7 +15,6 @@ interface RegisterFormData {
   password: string;
 }
 
-// 3. Replace 'any' with the new interface
 export async function registerStudent(formData: RegisterFormData) {
   const { name, email, matricNumber, password } = formData;
 
@@ -27,7 +29,7 @@ export async function registerStudent(formData: RegisterFormData) {
           { email },
           {
             studentProfile: {
-              matriculationNumber: matricNumber // Maps to the variable passed into your function
+              matriculationNumber: matricNumber
             }
           }
         ]
@@ -42,17 +44,14 @@ export async function registerStudent(formData: RegisterFormData) {
 
     await prisma.user.create({
       data: {
-        // 1. Base User Auth Fields
         email,
         password: hashedPassword,
-        role: "STUDENT", // (Optional if your schema default handles this)
-
-        // 2. Nested write to create the connected Student profile
+        role: "STUDENT",
         studentProfile: {
           create: {
             studentName: name,
-            matriculationNumber: matricNumber, // <-- Make sure this matches the schema spelling!
-            department: "Computer Science"     // <-- IMPORTANT: Your schema requires a department!
+            matriculationNumber: matricNumber,
+            department: "Computer Science"
           }
         }
       }
@@ -60,11 +59,43 @@ export async function registerStudent(formData: RegisterFormData) {
 
     return { success: true };
 
-    // 4. Replace 'any' with 'unknown' for strict type safety in the catch block
   } catch (error: unknown) {
     if (error instanceof Error) {
       return { success: false, error: error.message };
     }
     return { success: false, error: "An unexpected error occurred while creating the account." };
+  }
+}
+
+// ==========================================
+// 2. THE NEW LECTURER CGPA FUNCTION
+// ==========================================
+export async function updateStudentCgpa(studentProfileId: string, newCgpa: number) {
+  // 1. Get the current user making the request
+  const session = await auth();
+
+  // 2. STRICT RBAC CHECK: Only LECTURER (or ADMIN) can execute this function.
+  if (!session?.user || (session.user.role !== "LECTURER" && session.user.role !== "ADMIN")) {
+    return { success: false, error: "403 Forbidden: You do not have permission to update academic records." };
+  }
+
+  // 3. Update the database
+  try {
+    // We update the StudentProfile table directly
+    await prisma.student.update({
+      where: { id: studentProfileId }, // Ensure your modal passes the StudentProfile ID here
+      data: { cgpa: newCgpa },
+    });
+
+    // 4. Force Next.js to refresh the UI instantly
+    // Refresh the Lecturer page so they see the success
+    revalidatePath("/lecturer");
+    // Refresh the Student page so their dashboard updates
+    revalidatePath("/student");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Database update failed:", error);
+    return { success: false, error: "Failed to update CGPA in the database." };
   }
 }

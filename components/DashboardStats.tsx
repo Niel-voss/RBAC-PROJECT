@@ -3,6 +3,11 @@
 import { motion } from "framer-motion";
 import { Star, BookOpen, FileText, Users } from "lucide-react";
 
+// Define the expected prop from the server
+interface DashboardStatsProps {
+  studentCgpa: number | null;
+}
+
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -16,9 +21,10 @@ const cardVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-export default function DashboardStats() {
+export default function DashboardStats({ studentCgpa }: DashboardStatsProps) {
+  // Use the real CGPA from the database, fallback to 0.0 if not set yet
   const stats = {
-    cgpa: { current: 3.89, max: 5.00 },
+    cgpa: { current: studentCgpa ?? 0.0, max: 5.00 },
     courses: { current: 6, max: 10 },
     assignments: { current: 3, max: 10 },
     attendance: { current: 92, max: 100 },
@@ -38,9 +44,9 @@ export default function DashboardStats() {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-6"
     >
-      {/* 1. CGPA Card */}
+      {/* 1. Real CGPA Card */}
       <motion.div variants={cardVariants} className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[110px]">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">CGPA</span>
@@ -48,7 +54,7 @@ export default function DashboardStats() {
         </div>
         <div className="flex items-end justify-between mt-2">
           <div className="flex flex-col">
-            <span className="text-2xl font-bold text-slate-900 leading-none">{stats.cgpa.current}</span>
+            <span className="text-2xl font-bold text-slate-900 leading-none">{stats.cgpa.current.toFixed(2)}</span>
             <span className="text-[10px] text-slate-400 mt-1 font-medium">Out of {stats.cgpa.max.toFixed(2)}</span>
           </div>
           <div className="relative w-10 h-10 flex items-center justify-center -mb-1 -mr-1">

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Student" ADD COLUMN     "cgpa" DOUBLE PRECISION DEFAULT 0.0;
