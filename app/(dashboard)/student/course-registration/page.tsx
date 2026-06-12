@@ -19,23 +19,23 @@ const CourseRegistrationContent = () => {
   const [activeTab, setActiveTab] = useState('available');
 
   const courses = [
-    { code: 'CSC 401', title: 'Software Engineering', dept: 'Computer Science', lecturer: 'Dr. Adewale', level: '400', units: 3, schedule: 'Mon, Wed\n08:00 - 10:00 AM', status: 'add' },
-    { code: 'CSC 402', title: 'Database Systems', dept: 'Computer Science', lecturer: 'Prof. Okonkwo', level: '400', units: 3, schedule: 'Tue, Thu\n10:00 - 12:00 PM', status: 'add' },
-    { code: 'MAT 401', title: 'Advanced Calculus', dept: 'Mathematics', lecturer: 'Dr. Ibrahim', level: '400', units: 3, schedule: 'Mon, Wed\n02:00 - 04:00 PM', status: 'add' },
-    { code: 'PHY 401', title: 'Quantum Mechanics', dept: 'Physics', lecturer: 'Dr. Bello', level: '400', units: 3, schedule: 'Tue, Thu\n08:00 - 10:00 AM', status: 'added' },
-    { code: 'STA 401', title: 'Statistical Methods', dept: 'Statistics', lecturer: 'Dr. Adebayo', level: '400', units: 3, schedule: 'Fri\n10:00 - 01:00 PM', status: 'add' },
-    { code: 'CSC 403', title: 'Operating Systems', dept: 'Computer Science', lecturer: 'Dr. Adewale', level: '400', units: 3, schedule: 'Wed, Fri\n02:00 - 04:00 PM', status: 'add' },
-    { code: 'CSC 404', title: 'Artificial Intelligence', dept: 'Computer Science', lecturer: 'Prof. Okonkwo', level: '400', units: 3, schedule: 'Mon, Wed\n04:00 - 06:00 PM', status: 'add' },
-    { code: 'ECE 401', title: 'Digital Electronics', dept: 'Electrical Engineering', lecturer: 'Dr. Yusuf', level: '400', units: 3, schedule: 'Tue, Thu\n02:00 - 04:00 PM', status: 'add' },
+    { code: 'CSC 411', title: 'Operating Systems', dept: 'Computer Science', lecturer: 'Dr. Osagie', level: '400', units: 3, schedule: 'Mon, Wed\n08:00 - 10:00 AM', status: 'added' },
+    { code: 'CSC 413', title: 'Database Management', dept: 'Computer Science', lecturer: 'Prof. Omoruyi', level: '400', units: 3, schedule: 'Tue, Thu\n10:00 - 12:00 PM', status: 'added' },
+    { code: 'CSC 415', title: 'Artificial Intelligence', dept: 'Computer Science', lecturer: 'Dr. Igbinedion', level: '400', units: 3, schedule: 'Mon, Wed\n02:00 - 04:00 PM', status: 'add' },
+    { code: 'CSC 416', title: 'Computer Architecture', dept: 'Computer Science', lecturer: 'Dr. Eke', level: '400', units: 3, schedule: 'Tue, Thu\n08:00 - 10:00 AM', status: 'add' },
+    { code: 'CSC 418', title: 'Design & Analysis of Computer Algorithms', dept: 'Computer Science', lecturer: 'Prof. Edosomwan', level: '400', units: 3, schedule: 'Fri\n10:00 - 01:00 PM', status: 'added' },
+    { code: 'CSC 419', title: 'Research Seminar', dept: 'Computer Science', lecturer: 'Dr. Ogbomo', level: '400', units: 3, schedule: 'Wed, Fri\n02:00 - 04:00 PM', status: 'added' },
+    { code: 'CSC 427', title: 'Data Communications and Networks', dept: 'Computer Science', lecturer: 'Dr. Uyi', level: '400', units: 3, schedule: 'Mon, Wed\n04:00 - 06:00 PM', status: 'added' },
+    { code: 'CSC 499', title: 'Final Year Project', dept: 'Computer Science', lecturer: 'Project Supervisor', level: '400', units: 6, schedule: 'Tue, Thu\n02:00 - 04:00 PM', status: 'added' },
   ];
 
   const registeredCourses = [
-    { code: 'CSC 401', title: 'Software Engineering', units: 3 },
-    { code: 'CSC 402', title: 'Database Systems', units: 3 },
-    { code: 'PHY 401', title: 'Quantum Mechanics', units: 3 },
-    { code: 'STA 401', title: 'Statistical Methods', units: 3 },
-    { code: 'CSC 403', title: 'Operating Systems', units: 3 },
-    { code: 'MAT 401', title: 'Advanced Calculus', units: 3 },
+    { code: 'CSC 411', title: 'Operating Systems', units: 3 },
+    { code: 'CSC 413', title: 'Database Management', units: 3 },
+    { code: 'CSC 418', title: 'Design & Analysis of Computer Algorithms', units: 3 },
+    { code: 'CSC 419', title: 'Research Seminar', units: 3 },
+    { code: 'CSC 427', title: 'Data Communications and Networks', units: 3 },
+    { code: 'CSC 499', title: 'Final Year Project', units: 6 },
   ];
 
   return (

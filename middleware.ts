@@ -14,7 +14,7 @@ export default auth((req) => {
   const isLecturerRoute = nextUrl.pathname.startsWith('/lecturer');
   const isProtectedRoute = isStudentRoute || isAdminRoute || isLecturerRoute;
 
-  // 1. AUTHENTICATION REDIRECTS (If not logged in)
+  // AUTHENTICATION REDIRECTS (If not logged in)
   if (!isLoggedIn && isProtectedRoute) {
     // If trying to access Lecturer area, send to lecturer login
     if (isLecturerRoute) {
@@ -24,7 +24,7 @@ export default auth((req) => {
     return Response.redirect(new URL('/auth/login', nextUrl));
   }
 
-  // 2. AUTHORIZATION (If logged in, check if they belong in the current URL)
+  //  AUTHORIZATION (If logged in, check if they belong in the current URL)
   if (isLoggedIn && isProtectedRoute) {
     if (isAdminRoute && role !== 'ADMIN') {
       return Response.redirect(new URL('/unauthorized', nextUrl));

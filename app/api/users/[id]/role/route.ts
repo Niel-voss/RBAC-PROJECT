@@ -82,7 +82,7 @@ export async function PATCH(
             lecturerProfile: {
               create: {
                 lecturerName: baseName, // Applied here
-                course: "Unassigned",
+                course: "Computer Science",
               }
             }
           }
