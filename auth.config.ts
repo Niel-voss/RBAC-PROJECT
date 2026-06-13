@@ -1,10 +1,28 @@
 import type { NextAuthConfig } from "next-auth";
-
+import { prisma } from "@/lib/prisma";
 export const authConfig = {
   session: {
     strategy: "jwt", // stores user session in cookie rather than the database
   },
   providers: [],
+  // 🚀 ADD THIS EVENTS BLOCK:
+  events: {
+    async signIn({ user }) {
+      // This runs automatically in the background every time ANY user logs in successfully
+      try {
+        await prisma.auditLog.create({
+          data: {
+            action: "USER_LOGIN",
+            actor: user.name || user.email || "Unknown User",
+            target: "System Authentication",
+            details: `Logged into the system successfully.`,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to log sign-in event:", error);
+      }
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       // The 'user' object is only passed in the first time the user logs in.

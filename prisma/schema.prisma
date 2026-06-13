@@ -96,3 +96,12 @@ model Admin {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String // e.g., "UPDATE_CGPA", "CREATE_USER", "SUSPEND_USER"
+  actor     String // e.g., "Lecturer John Doe" or "Admin Admin"
+  target    String // e.g., "Student Jane Smith"
+  details   String? // e.g., "Changed CGPA to 4.5"
+  createdAt DateTime @default(now())
+}

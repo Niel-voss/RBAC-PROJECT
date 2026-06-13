@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     const existingMatric = await prisma.student.findUnique({
-      where: { matriculationNumber: matricNumber }, // Map to Prisma's exact column name
+      where: { matriculationNumber: matricNumber },
     });
 
     if (existingMatric) {
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         studentProfile: {
           create: {
             studentName: name,
-            matriculationNumber: matricNumber, // Map to Prisma's exact column name
+            matriculationNumber: matricNumber,
             department: "Unassigned",
           },
         },
@@ -74,6 +74,17 @@ export async function POST(request: Request) {
       include: {
         studentProfile: true,
       },
+    });
+
+    // 🚀 6. THE AUDIT LOG (NEW)
+    // We log that the user created their own account
+    await prisma.auditLog.create({
+      data: {
+        action: "USER_REGISTERED",
+        actor: name, // The name they entered in the form
+        target: "System Registration",
+        details: `Student self-registered with Matric No: ${matricNumber}`,
+      }
     });
 
     return NextResponse.json(

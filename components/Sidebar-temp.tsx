@@ -39,7 +39,8 @@ export default function Sidebar({ role }: SidebarProps) {
     { name: 'Academic Structure', icon: LayoutGrid, path: '/academic-structure', allowedRoles: ['admin'] },
     { name: 'Session and Semester', icon: Calendar, path: '/session-settings', allowedRoles: ['admin'] },
     { name: 'Admission', icon: ClipboardList, path: '/admission', allowedRoles: ['admin'] },
-    { name: 'Broadcasts', icon: Megaphone, path: '/broadcasts', allowedRoles: ['admin'] }
+    { name: 'Broadcasts', icon: Megaphone, path: '/broadcasts', allowedRoles: ['admin'] },
+    { name: "Audit Logs", icon: LibraryIcon, path: '/audit-logs', allowedRoles: ['admin'] },
   ];
 
   // Filter links based on the role passed from the layout

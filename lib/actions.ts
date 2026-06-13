@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { auth } from "@/auth"; // <-- Add this import for RBAC checks!
 import { revalidatePath } from "next/cache"; // <-- Add this to refresh the page after updating
 
+
 // ==========================================
 // 1. YOUR EXISTING ADMIN REGISTER FUNCTION
 // ==========================================
@@ -16,6 +17,9 @@ interface RegisterFormData {
 }
 
 export async function registerStudent(formData: RegisterFormData) {
+
+  const session = await auth();
+  const actorName = session?.user?.name || session?.user?.email || "System Lecturer";
   const { name, email, matricNumber, password } = formData;
 
   if (!email || !password || !matricNumber || !name) {
@@ -56,6 +60,14 @@ export async function registerStudent(formData: RegisterFormData) {
         }
       }
     });
+    await prisma.auditLog.create({
+      data: {
+        action: "CREATE_USER",
+        actor: actorName,
+        target: `Student: ${name} (${matricNumber})`,
+        details: `Created a new student account with email ${email}`,
+      }
+    });
 
     return { success: true };
 
@@ -73,6 +85,7 @@ export async function registerStudent(formData: RegisterFormData) {
 export async function updateStudentCgpa(studentProfileId: string, newCgpa: number) {
   // 1. Get the current user making the request
   const session = await auth();
+  const actorName = session?.user?.name || session?.user?.email || "System Lecturer";
 
   // 2. STRICT RBAC CHECK: Only LECTURER (or ADMIN) can execute this function.
   if (!session?.user || (session.user.role !== "LECTURER" && session.user.role !== "ADMIN")) {
@@ -85,6 +98,14 @@ export async function updateStudentCgpa(studentProfileId: string, newCgpa: numbe
     await prisma.student.update({
       where: { id: studentProfileId }, // Ensure your modal passes the StudentProfile ID here
       data: { cgpa: newCgpa },
+    });
+    await prisma.auditLog.create({
+      data: {
+        action: "UPDATE_CGPA",
+        actor: actorName,
+        target: `Student ID: ${studentProfileId}`,
+        details: `Updated CGPA to ${newCgpa.toFixed(2)}`,
+      }
     });
 
     // 4. Force Next.js to refresh the UI instantly

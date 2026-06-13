@@ -16,6 +16,9 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
     }
 
+    // Extract the Admin's name for the Audit Log
+    const adminName = session.user.name || session.user.email || "System Admin";
+
     // Protect the Chief Admin from accidentally demoting themselves!
     if (id === session.user.id) {
       return NextResponse.json({ error: "You cannot change your own role" }, { status: 400 });
@@ -100,6 +103,17 @@ export async function PATCH(
           }
         });
       }
+
+      // 🚀 THE MISSING PIECE: Step C
+      // Log the action INSIDE the transaction so it only saves if everything else succeeds!
+      await tx.auditLog.create({
+        data: {
+          action: "UPDATE_ROLE",
+          actor: adminName,
+          target: baseName, // The user whose role was changed
+          details: `Changed account role from ${currentUser.role} to ${newRole}`,
+        }
+      });
     });
 
     // 4. Send success back
