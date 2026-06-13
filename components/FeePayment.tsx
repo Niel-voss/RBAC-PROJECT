@@ -40,11 +40,11 @@ export default function FeePayment() {
       <div className="flex flex-col gap-2.5 mb-2.5">
         <div className="flex justify-between items-center">
           <span className="text-[11px] text-slate-500">Total Fees</span>
-          <span className="text-[11px] font-bold text-slate-900">₦450,000</span>
+          <span className="text-[11px] font-bold text-slate-900">₦95,750</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-[11px] text-slate-500">Amount Paid</span>
-          <span className="text-[11px] font-bold text-green-600">₦450,000</span>
+          <span className="text-[11px] font-bold text-green-600">₦95,750</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-[11px] text-slate-500">Outstanding</span>
