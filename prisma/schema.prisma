@@ -79,7 +79,7 @@ model Lecturer {
 
   // Specific Lecturer Fields
   lecturerName String
-  course       String
+  course       String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
