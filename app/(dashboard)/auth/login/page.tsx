@@ -13,7 +13,6 @@ import {
   Lock,
   Lightbulb,
   SquarePen,
-  ArrowLeft,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -74,10 +73,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center p-4 font-sans">
-      <Link href="/" aria-label="Home" className="absolute left-6 top-6 text-[#0a1845] hover:text-[#0a1845]">
-        <ArrowLeft size={18} />
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center p-4 font-sans">
       <div className="w-full max-w-[340px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-7">
 
         <div className="flex flex-col items-center mb-5">

@@ -12,8 +12,7 @@ import {
   Mail,
   IdCard,
   Lock,
-  Info,
-  ArrowLeft,
+  Info
 } from 'lucide-react';
 
 export default function CreateAccountMicro() {
@@ -97,10 +96,7 @@ export default function CreateAccountMicro() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex items-center justify-center p-4 font-sans">
-      <Link href="/" aria-label="Home" className="absolute left-6 top-6 text-[#0a1845] hover:text-[#0a1845]">
-        <ArrowLeft size={18} />
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex items-center justify-center p-4 font-sans">
 
       {/* Modal overlay */}
       {showModal && (
