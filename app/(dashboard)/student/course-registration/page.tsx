@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link";
 import React, { useState } from 'react';
 import {
   Calendar,
@@ -47,10 +48,12 @@ const CourseRegistrationContent = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Course Registration</h1>
           <p className="text-gray-500 text-sm">Browse and register for available courses for the selected semester.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#0f172a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">
-          <Calendar className="w-4 h-4" />
-          View Timetable
-        </button>
+        <Link href="/student/timetable">
+          <button className="flex items-center gap-2 bg-[#0f172a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">
+            <Calendar className="w-4 h-4" />
+            View Timetable
+          </button>
+        </Link>
       </div>
 
       {/* Status Banner */}

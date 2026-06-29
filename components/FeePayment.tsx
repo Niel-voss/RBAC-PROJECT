@@ -69,7 +69,7 @@ export default function FeePayment() {
         <div className="flex flex-col gap-2.5">
           <div className="flex justify-between items-center">
             <span className="text-[11px] text-slate-500">School Fees - Sem 2</span>
-            <span className="text-[11px] font-bold text-slate-900">₦350,000</span>
+            <span className="text-[11px] font-bold text-slate-900">₦95,750</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-[11px] text-slate-500">Development Levy</span>

@@ -9,6 +9,24 @@ import bcrypt from "bcryptjs";
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
+  // 🚀 ADD THIS EVENTS BLOCK:
+  events: {
+    async signIn({ user }) {
+      // This runs automatically in the background every time ANY user logs in successfully
+      try {
+        await prisma.auditLog.create({
+          data: {
+            action: "USER_LOGIN",
+            actor: user.name || user.email || "Unknown User",
+            target: "System Authentication",
+            details: `Logged into the system successfully.`,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to log sign-in event:", error);
+      }
+    },
+  },
   providers: [
     Credentials({
       name: "Credentials",
