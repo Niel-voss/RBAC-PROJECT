@@ -13,6 +13,7 @@ import {
   Lock,
   Lightbulb,
   SquarePen,
+  ArrowLeft, // <-- Added ArrowLeft
 } from 'lucide-react';
 
 export default function LecturerLoginPage() {
@@ -71,7 +72,21 @@ export default function LecturerLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center p-4 font-sans">
+    // Added 'relative' to the container for absolute positioning of the back button
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center p-4 font-sans relative">
+
+      {/* --- ADDED BACK BUTTON --- */}
+      <Link
+        href="/"
+        className="absolute top-10 left-20 flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium"
+      >
+
+        <span className="hidden sm:inline">
+          <ArrowLeft size={20} />
+        </span>
+      </Link>
+      {/* ------------------------- */}
+
       <div className="w-full max-w-[340px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-7">
 
         <div className="flex flex-col items-center mb-5">

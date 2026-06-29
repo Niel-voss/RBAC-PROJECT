@@ -12,7 +12,8 @@ import {
   Mail,
   IdCard,
   Lock,
-  Info
+  Info,
+  ArrowLeft, // <-- Added ArrowLeft
 } from 'lucide-react';
 
 export default function CreateAccountMicro() {
@@ -97,6 +98,17 @@ export default function CreateAccountMicro() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex items-center justify-center p-4 font-sans">
+      {/* --- ADDED BACK BUTTON --- */}
+      <Link
+        href="/"
+        className="absolute top-10 left-20 flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium"
+      >
+
+        <span className="hidden sm:inline">
+          <ArrowLeft size={20} />
+        </span>
+      </Link>
+      {/* ------------------------- */}
 
       {/* Modal overlay */}
       {showModal && (
