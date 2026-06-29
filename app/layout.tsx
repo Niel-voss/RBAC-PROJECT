@@ -5,7 +5,11 @@ import { prisma } from "@/lib/prisma"; // Adjust path if your prisma client is e
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // 1. Get the basic session (which guarantees an email if logged in)
+  console.log("Fetching session in RootLayout...");
+
   const session = await auth();
+
+  console.log("🟢 2. auth() finished successfully! Session:", session?.user?.email);
 
   let displayName = "User";
   let userRole = "student";
