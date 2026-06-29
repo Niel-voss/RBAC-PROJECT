@@ -75,17 +75,14 @@ export default function LecturerLoginPage() {
     // Added 'relative' to the container for absolute positioning of the back button
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center p-4 font-sans relative">
 
-      {/* --- ADDED BACK BUTTON --- */}
       <Link
         href="/"
-        className="absolute top-10 left-20 flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium"
+        className="absolute top-4 left-4 flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium z-50"
       >
-
-        <span className="hidden sm:inline">
-          <ArrowLeft size={20} />
-        </span>
+        <ArrowLeft size={20} />
+        {/* Added optional text for better UX */}
+        <span className="hidden sm:inline">Back</span>
       </Link>
-      {/* ------------------------- */}
 
       <div className="w-full max-w-[340px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-7">
 
