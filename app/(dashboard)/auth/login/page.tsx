@@ -90,7 +90,7 @@ export default function LoginPage() {
 
         <div className="flex flex-col items-center mb-5">
           <h2 className="text-[18px] sm:text-[20px] font-bold text-slate-900 mb-1 tracking-tight text-center">Welcome Back</h2>
-          <p className="text-slate-500 text-[11px] text-center">Login to the Univ. of Oluku Portal</p>
+          <p className="text-slate-500 text-[11px] text-center">Login to the Univ. of Miradelle Portal</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3" method="POST">

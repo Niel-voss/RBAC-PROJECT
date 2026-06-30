@@ -35,8 +35,8 @@ export default function NavBar({ userName, userRole }: NavBarProps) {
             <GraduationCap className="w-5 h-5 text-white" strokeWidth={2} />
           </div>
           <div className="hidden md:flex flex-col">
-            <span className="font-bold text-slate-800 text-sm leading-tight">Federal Univ.</span>
-            <span className="text-[10px] text-slate-500 font-medium leading-tight">of Oluku</span>
+            <span className="font-bold text-slate-800 text-sm leading-tight">Univ.</span>
+            <span className="text-[10px] text-slate-500 font-medium leading-tight">of Miradelle</span>
           </div>
         </div>
       </div>
