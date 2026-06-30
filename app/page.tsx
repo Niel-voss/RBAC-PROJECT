@@ -21,7 +21,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center py-8 px-4 sm:px-6 bg-[#FAFAFA] font-sans overflow-x-hidden">
+    <div className="min-h-screen flex flex-col items-center pt-16 sm:pt-24 pb-8 px-4 sm:px-6 bg-[#FAFAFA] font-sans overflow-x-hidden">
 
       <div className="w-full max-w-3xl z-10 flex flex-col items-center">
 
