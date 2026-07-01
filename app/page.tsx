@@ -190,10 +190,21 @@ export default function LandingPage() {
         </div>
 
         {/* Global Footer */}
-        <div className="mt-10 mb-6 text-center text-gray-500 text-xs flex flex-col sm:flex-row items-center justify-center gap-2">
-          <span>Thomas Daniel</span>|<span>Secure. Role-based. Built for Learning.</span>
-          <span className="hidden sm:inline">|</span>
-          <span>© 2025 mlradelle</span>
+        <div className="mt-10 mb-6 text-center text-gray-500 text-xs flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+
+          {/* Name and Tagline Group (Always on same line) */}
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-600">Thomas Daniel</span>
+            <span className="text-gray-300">|</span>
+            <span>Secure. Role-based. Built for Learning.</span>
+          </div>
+
+          {/* Desktop Divider */}
+          <span className="hidden sm:inline text-gray-300">|</span>
+
+          {/* Copyright */}
+          <span>© 2025 Miradelle</span>
+
         </div>
 
       </div>
