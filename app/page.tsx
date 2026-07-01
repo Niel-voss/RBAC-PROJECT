@@ -28,7 +28,7 @@ export default function LandingPage() {
         {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl font-bold text-[#111827] mb-3 leading-tight">
-            Welcome to <br /> Univ. Miradelle
+            Welcome to the<br /> Univ. Miradelle
           </h1>
           <p className="text-gray-500 text-sm sm:text-base">
             Please select your portal to continue:
@@ -191,7 +191,7 @@ export default function LandingPage() {
 
         {/* Global Footer */}
         <div className="mt-10 mb-6 text-center text-gray-500 text-xs flex flex-col sm:flex-row items-center justify-center gap-2">
-          <span>Secure. Role-based. Built for Learning.</span>
+          <span>Thomas Daniel</span>|<span>Secure. Role-based. Built for Learning.</span>
           <span className="hidden sm:inline">|</span>
           <span>© 2025 mlradelle</span>
         </div>
