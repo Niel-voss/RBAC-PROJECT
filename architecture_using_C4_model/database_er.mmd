@@ -1,0 +1,38 @@
+flowchart TD
+    %% Styling Definitions for a professional look
+    classDef entity fill:#1E293B,stroke:#64748B,stroke-width:2px,color:#F8FAFC
+    classDef relation fill:#7F1D1D,stroke:#991B1B,stroke-width:2px,color:#FEF2F2
+    classDef standalone fill:#14532D,stroke:#166534,stroke-width:2px,color:#F0FDF4
+
+    %% 1. The Core Authentication Entity
+    User["**USER**<br/>-------------<br/>id (PK)<br/>email (UK)<br/>password<br/>role (Enum)<br/>isVerified"]:::entity
+
+    %% 2. The Relationship Diamonds (Academic Standard)
+    RelStud{"Delegates<br/>Profile"}:::relation
+    RelLec{"Delegates<br/>Profile"}:::relation
+    RelAdm{"Delegates<br/>Profile"}:::relation
+
+    %% 3. The Specific Role Entities
+    Student["**STUDENT**<br/>-------------<br/>id (PK)<br/>userId (FK, UK)<br/>studentName<br/>matriculationNumber (UK)<br/>department<br/>cgpa"]:::entity
+    
+    Lecturer["**LECTURER**<br/>-------------<br/>id (PK)<br/>userId (FK, UK)<br/>lecturerName<br/>course"]:::entity
+    
+    Admin["**ADMIN**<br/>-------------<br/>id (PK)<br/>userId (FK, UK)<br/>adminName"]:::entity
+
+    %% 4. The Independent Logging Entity
+    AuditLog["**AUDIT_LOG**<br/>-------------<br/>id (PK)<br/>action<br/>actor<br/>target<br/>details<br/>createdAt"]:::standalone
+
+    %% --- MAPPING THE RELATIONSHIPS (With Cardinality) ---
+    %% A User must exist (1) to have a profile, but the profile might not exist yet (0..1)
+    
+    User -- "1" --- RelStud
+    RelStud -- "0..1" --> Student
+
+    User -- "1" --- RelLec
+    RelLec -- "0..1" --> Lecturer
+
+    User -- "1" --- RelAdm
+    RelAdm -- "0..1" --> Admin
+
+    %% Invisible link to keep the Audit Log aligned neatly on the canvas
+    Student ~~~ AuditLog

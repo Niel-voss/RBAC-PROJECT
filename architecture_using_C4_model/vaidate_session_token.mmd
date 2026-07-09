@@ -1,0 +1,16 @@
+flowchart TD
+
+    A[User Request] --> B[Middleware]
+    B --> C[Core API Engine]
+    C --> D[Database]
+
+    D --> E{Session Valid?}
+
+    E -- No --> F[404 Unauthorized Page]
+
+    E -- Yes --> G{Role Valid?}
+
+    G -- Student --> H[Student Dashboard]
+    G -- Lecturer --> I[Lecturer Dashboard]
+    G -- Admin --> J[Admin Dashboard]
+    G -- Invalid --> F

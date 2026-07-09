@@ -1,0 +1,50 @@
+sequenceDiagram
+    autonumber
+    
+    %% Define the actors and systems participating in the flow
+    actor Client as User (Admin / Student)
+    participant Middleware as Next.js Edge Middleware
+    participant Auth as Auth.js v5 beta
+    participant DB as Neon PostgreSQL (Prisma)
+    participant Server as Next.js App Router (UI / API)
+
+    %% The Request Timeline begins
+    Client->>Middleware: 1. HTTP Request (e.g., GET /admin or POST /api/roles)
+    
+    %% Middleware intercepts and starts processing
+    activate Middleware
+    Middleware->>Auth: 2. Decode Session Cookie
+    
+    activate Auth
+    Auth-->>Middleware: 3. Return Session Identity & Role
+    deactivate Auth
+
+    %% First Check: Are they logged in?
+    alt Session is Invalid / Missing
+        Middleware-->>Client: 401 Unauthorized (Redirect to /login)
+    else Session is Valid
+        %% Second Check: Do they have the right RBAC permissions?
+        Middleware->>DB: 4. Query active policies for Role (via Prisma Edge)
+        
+        activate DB
+        DB-->>Middleware: 5. Return Permission Status
+        deactivate DB
+
+        alt Role Lacks Permission
+            Middleware-->>Client: 403 Forbidden (Halt execution)
+        else Role is Authorized
+            %% The request is finally allowed into the Core Engine
+            Middleware->>Server: 6. Forward Authorized Request
+            
+            activate Server
+            Server->>DB: 7. Execute Core Business Logic / Fetch Data
+            
+            activate DB
+            DB-->>Server: 8. Return Dataset
+            deactivate DB
+            
+            Server-->>Client: 9. Render HTML Page OR Return JSON Response
+            deactivate Server
+        end
+    end
+    deactivate Middleware

@@ -1,0 +1,52 @@
+flowchart LR
+    %% The Actors
+    Student(((Student)))
+    Lecturer(((Lecturer)))
+    Admin(((System Admin)))
+
+    %% The System Boundary
+    subgraph Portal [University Portal Features]
+        
+        %% STUDENT FEATURES
+        UC_Courses([View Enrolled Courses])
+        UC_Results([Check Semester Results])
+        UC_Time([View Timetable])
+        UC_Pay([Make Payments])
+        UC_ViewAnn([View Announcements])
+        
+        %% LECTURER FEATURES
+        UC_EditGrades([Edit Grades])
+        UC_ChangeTime([Change Timetable])
+        UC_SubmitGrades([Submit Grades])
+        
+        %% ADMIN FEATURES
+        UC_MakeAnn([Make Announcements])
+        UC_ChangeRoles([Change Roles])
+        UC_AssignPerms([Assign Permissions])
+        UC_CreateAcc([Create Accounts])
+        UC_Audit([Access Audit Log])
+
+        %% THE HACK: Invisible links forcing a strict vertical column
+        UC_Courses ~~~ UC_Results ~~~ UC_Time ~~~ UC_Pay ~~~ UC_ViewAnn ~~~ UC_EditGrades ~~~ UC_ChangeTime ~~~ UC_SubmitGrades ~~~ UC_MakeAnn ~~~ UC_ChangeRoles ~~~ UC_AssignPerms ~~~ UC_CreateAcc ~~~ UC_Audit
+    end
+
+    %% --- MAPPINGS: Who can do what? ---
+    
+    %% Student Access
+    Student ---> UC_Courses
+    Student ---> UC_Results
+    Student ---> UC_Time
+    Student ---> UC_Pay
+    Student ---> UC_ViewAnn
+
+    %% Lecturer Access
+    Lecturer ---> UC_EditGrades
+    Lecturer ---> UC_ChangeTime
+    Lecturer ---> UC_SubmitGrades
+
+    %% Admin Access
+    Admin ---> UC_MakeAnn
+    Admin ---> UC_ChangeRoles
+    Admin ---> UC_AssignPerms
+    Admin ---> UC_CreateAcc
+    Admin ---> UC_Audit

@@ -1,0 +1,39 @@
+C4Container
+    title Container Diagram - Role-Based Routing Architecture
+
+    %% The Actors
+    Person(users, "Student / Lecturer", "Standard campus users.")
+    Person(admin, "System Admin", "Platform administrator.")
+
+    %% The System Boundary
+    Boundary(app_boundary, "Next.js Campus Application") {
+        
+        %% 1. The Entry Point
+        Container(web_app, "University Portal Frontend", "Next.js UI", "The initial client-facing web application interface.")
+        
+        %% 2. The Gatekeeper
+        Container(middleware, "Authentication Middleware", "Auth.js v5 beta", "The route protector. Intercepts all traffic to verify sessions and dynamic RBAC rules.")
+        
+        %% 3a. The UI Destinations (Grouping your individual dashboards)
+        Container(dashboards, "Protected Dashboards", "React Server Components", "Renders the specific authorized view (Student, Lecturer, Admin) or 404/403 fallback.")
+        
+        %% 3b. The Backend Destination
+        Container(api, "Core API Engine", "Next.js Route Handlers", "Executes secure backend business logic.")
+        
+        %% 4. The Data Layer
+        ContainerDb(db, "PostgreSQL Database", "Neon / Prisma ORM", "Stores user identities, dynamic roles, and application data.")
+    }
+
+    %% --- THE TRAFFIC FLOW ---
+    Rel_D(users, web_app, "Navigates to", "HTTPS")
+    Rel_D(admin, web_app, "Navigates to", "HTTPS")
+
+    Rel_D(web_app, middleware, "Triggers page/route request", "Internal")
+
+    %% Middleware splits the traffic based on authorization
+    Rel_D(middleware, dashboards, "Routes to authorized UI", "Server Render")
+    Rel_D(middleware, api, "Forwards secure API call", "Internal Route")
+
+    %% Database interactions
+    Rel_D(api, db, "Queries / Mutates", "Prisma Client")
+    Rel_U(db, api, "Returns dataset", "Prisma Data")
