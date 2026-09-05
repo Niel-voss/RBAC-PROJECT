@@ -28,7 +28,7 @@ export default function LandingPage() {
         {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl font-bold text-[#111827] mb-3 leading-tight">
-            Welcome to the<br /> University of Benin
+            Welcome to the<br /> Univ. of Miradelle
           </h1>
           <p className="text-gray-500 text-sm sm:text-base">
             Please select your portal to continue:
