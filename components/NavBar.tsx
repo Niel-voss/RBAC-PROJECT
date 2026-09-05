@@ -36,7 +36,7 @@ export default function NavBar({ userName, userRole }: NavBarProps) {
           </div>
           <div className="hidden md:flex flex-col">
             <span className="font-bold text-slate-800 text-sm leading-tight">Univ.</span>
-            <span className="text-[10px] text-slate-500 font-medium leading-tight">of Miradelle</span>
+            <span className="text-[10px] text-slate-500 font-medium leading-tight">of Benin</span>
           </div>
         </div>
       </div>
