@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    participant Client as Next.js Client (Login Page)
+    participant NextAuth as NextAuth.js (Credentials Provider)
+    participant Prisma as Prisma Client
+    participant Neon as Neon DB (PostgreSQL)
+
+    Client->>NextAuth: POST /api/auth/callback (email, password)
+    NextAuth->>Prisma: prisma.user.findUnique(email)
+    Prisma->>Neon: SELECT * FROM User WHERE email = $1
+    Neon-->>Prisma: Returns User Record (hash and role)
+    Prisma-->>NextAuth: User Object
+    
+    Note over NextAuth: bcrypt.compare(Password)
+    
+    alt Password Match
+        NextAuth-->>Client: Set Cookie - JWT Session Token
+        Client->>Client: Route user to respective dashboard
+    else Password Mismatch
+        NextAuth-->>Client: Return 401 Unauthorized Error
+    end

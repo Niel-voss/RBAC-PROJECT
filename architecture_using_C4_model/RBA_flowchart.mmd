@@ -1,0 +1,31 @@
+flowchart TD
+    Start(["User Requests Protected Route"]) --> Middleware["middleware.ts Intercepts Request"]
+    Middleware --> CheckSession{"Is NextAuth Session Cookie Present?"}
+    
+    CheckSession -- No --> RedirectLogin["NextResponse.redirect('/login')"]
+    
+    CheckSession -- Yes --> ExtractToken["Extract token.role from JWT"]
+    ExtractToken --> RouteCheck{"Evaluate Requested Path"}
+    
+    RouteCheck -- Starts with /admin --> AdminAuth{"token.role === 'ADMIN'?"}
+    RouteCheck -- Starts with /lecturer --> LecturerAuth{"token.role === 'LECTURER'?"}
+    RouteCheck -- Starts with /student --> StudentAuth{"token.role === 'STUDENT'?"}
+    
+    AdminAuth -- Yes --> AllowAccess["NextResponse.next()"]
+    LecturerAuth -- Yes --> AllowAccess
+    StudentAuth -- Yes --> AllowAccess
+    
+    AdminAuth -- No --> DenyAccess["NextResponse.rewrite('/unauthorized')"]
+    LecturerAuth -- No --> DenyAccess
+    StudentAuth -- No --> DenyAccess
+    
+    AllowAccess --> EndAllow(["Grant Access to Requested Dashboard"])
+    DenyAccess --> EndDeny(["Render Unauthorized View"])
+    RedirectLogin --> EndRedirect(["Render Login Page"])
+
+    %% --- THE FIX: ADD THIS STYLING BLOCK ---
+    %% Define a class for clean formatting (white background, black stroke, black text)
+    classDef fixStyle fill:#fff,stroke:#000,stroke-width:1px,color:#000;
+
+    %% Apply the class to ALL node IDs used in the chart
+    class Start,Middleware,CheckSession,RedirectLogin,ExtractToken,RouteCheck,AdminAuth,LecturerAuth,StudentAuth,AllowAccess,DenyAccess,EndAllow,EndDeny,EndRedirect fixStyle;

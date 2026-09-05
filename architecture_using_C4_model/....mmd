@@ -1,0 +1,14 @@
+---
+id: 9adca107-9ed0-4e1f-a137-3bdfc8acee03
+---
+flowchart LR
+    %% Styling Definitions
+    classDef user fill:#1E293B,stroke:#64748B,stroke-width:2px,color:#F8FAFC
+    classDef role fill:#7F1D1D,stroke:#991B1B,stroke-width:2px,color:#FEF2F2
+    classDef perm fill:#064E3B,stroke:#047857,stroke-width:2px,color:#F0FDF4
+    classDef route fill:#422006,stroke:#713F12,stroke-width:2px,color:#FEF3C7
+
+    %% The Flow
+    U([User Identity]):::user -->|1. Assigned| R{Dynamic Role}:::role
+    R -->|2. Contains| P([Permission Payload]):::perm
+    P -->|3. Evaluated For| Dest[/Protected Route / API endpoint/]:::route
